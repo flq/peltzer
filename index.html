@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="/src/styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Peltzer - Gremlin Browser</title>
+    <script type="module" src="/src/main.ts" defer></script>
+  </head>
+
+  <body>
+    <div class="app-layout">
+      <!-- Sidebar: Connection Management -->
+      <aside class="sidebar">
+        <h2>Connections</h2>
+
+        <div id="connection-status" class="connection-status disconnected">
+          Disconnected
+        </div>
+
+        <div id="saved-connections" class="saved-connections">
+          <!-- Saved connections will be listed here -->
+        </div>
+
+        <details class="connection-form-details">
+          <summary>New Connection</summary>
+          <form id="connection-form" class="connection-form">
+            <label>
+              Name
+              <input type="text" id="conn-name" placeholder="My Database" required />
+            </label>
+            <label>
+              Host
+              <input type="text" id="conn-host" placeholder="localhost" required />
+            </label>
+            <label>
+              Port
+              <input type="number" id="conn-port" value="8182" required />
+            </label>
+            <label>
+              Username
+              <input type="text" id="conn-username" placeholder="(optional)" />
+            </label>
+            <label>
+              Password
+              <input type="password" id="conn-password" placeholder="(optional)" />
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="conn-ssl" />
+              Use SSL/TLS
+            </label>
+            <div class="form-actions">
+              <button type="button" id="test-connection-btn">Test</button>
+              <button type="submit">Save</button>
+            </div>
+          </form>
+        </details>
+      </aside>
+
+      <!-- Main Area: Query + Results -->
+      <main class="main-content">
+        <div class="query-section">
+          <div class="query-header">
+            <h3>Query</h3>
+            <button id="execute-btn" disabled>Execute (Ctrl+Enter)</button>
+          </div>
+          <textarea
+            id="query-input"
+            placeholder="g.V().limit(10)"
+            spellcheck="false"
+          ></textarea>
+        </div>
+
+        <div class="results-section">
+          <div class="results-header">
+            <h3>Results</h3>
+            <span id="result-count"></span>
+          </div>
+          <pre id="results-output"></pre>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>
