@@ -10,7 +10,9 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "db:start": "docker compose up -d",
+    "db:stop": "docker compose stop"
   },
   "dependencies": {
     "@tauri-apps/api": "^2",
