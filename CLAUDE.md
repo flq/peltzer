@@ -68,7 +68,7 @@ Use `/verify` after code changes to run all builds and tests.
 ### Testing
 - Component tests use `@testing-library/svelte` with jsdom
 - Mock Tauri APIs in `src/test/setup.ts`
-- Test files live next to components: `Component.test.ts`
+- Test files live in `__tests__` subfolder: `src/components/__tests__/Component.test.ts`
 
 ## Supported Databases
 
@@ -78,7 +78,6 @@ Use `/verify` after code changes to run all builds and tests.
 
 ## Future Work
 
-- Docker dev environment for local Gremlin server
 - Query history
 - Graph visualization
 - Schema exploration

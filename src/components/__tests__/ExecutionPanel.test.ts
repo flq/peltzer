@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/svelte";
-import ExecutionPanel from "./ExecutionPanel.svelte";
-import { isConnected } from "../lib/stores";
-import * as api from "../lib/api";
+import ExecutionPanel from "../ExecutionPanel.svelte";
+import { isConnected } from "../../lib/stores";
+import * as api from "../../lib/api";
 
 // Mock the API module
-vi.mock("../lib/api", () => ({
+vi.mock("../../lib/api", () => ({
   executeQuery: vi.fn(),
 }));
 
