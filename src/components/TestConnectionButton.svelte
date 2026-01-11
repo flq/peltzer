@@ -24,4 +24,4 @@
   }
 </script>
 
-<Button type="button" pending={testing} onclick={handleTest}>Test</Button>
+<Button type="button" kind="secondary" pending={testing} onclick={handleTest}>Test</Button>

@@ -1,14 +1,13 @@
 <script lang="ts">
   import { toasts } from "../lib/toastStore";
+  import Button from "./Button.svelte";
 </script>
 
 <div class="toast-container">
   {#each $toasts as toast (toast.id)}
     <div class="toast toast-{toast.type}">
       <span class="toast-message">{toast.message}</span>
-      <button class="toast-close" onclick={() => toasts.remove(toast.id)}>
-        &times;
-      </button>
+      <Button kind="bare" size="big" onclick={() => toasts.remove(toast.id)}>&times;</Button>
     </div>
   {/each}
 </div>
@@ -30,7 +29,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 12px 16px;
+    padding: 12px 8px 12px 16px;
     border-radius: 4px;
     min-width: 250px;
     max-width: 400px;
@@ -48,20 +47,5 @@
 
   .toast-message {
     flex: 1;
-  }
-
-  .toast-close {
-    background: none;
-    border: none;
-    color: inherit;
-    font-size: 20px;
-    cursor: pointer;
-    padding: 0;
-    line-height: 1;
-    opacity: 0.8;
-  }
-
-  .toast-close:hover {
-    opacity: 1;
   }
 </style>
