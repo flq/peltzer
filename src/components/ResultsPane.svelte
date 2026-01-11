@@ -1,13 +1,14 @@
 <script lang="ts">
-  import { results, resultCount } from "../lib/stores";
+  export let results = "";
+  export let resultCount = "";
 </script>
 
 <div class="results-section">
   <div class="results-header">
     <h3>Results</h3>
-    <span class="result-count">{$resultCount}</span>
+    <span class="result-count">{resultCount}</span>
   </div>
-  <pre class="results-output">{$results}</pre>
+  <pre class="results-output">{results}</pre>
 </div>
 
 <style>

@@ -1,8 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import Sidebar from "./components/Sidebar.svelte";
-  import QueryPane from "./components/QueryPane.svelte";
-  import ResultsPane from "./components/ResultsPane.svelte";
+  import ExecutionPanel from "./components/ExecutionPanel.svelte";
   import {
     savedConnections,
     activeConnection,
@@ -32,22 +31,12 @@
 
 <div class="app-layout">
   <Sidebar />
-  <main class="main-content">
-    <QueryPane />
-    <ResultsPane />
-  </main>
+  <ExecutionPanel />
 </div>
 
 <style>
   .app-layout {
     display: flex;
     height: 100vh;
-  }
-
-  .main-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
   }
 </style>

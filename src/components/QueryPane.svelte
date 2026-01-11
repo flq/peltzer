@@ -1,47 +1,25 @@
 <script lang="ts">
-  import {
-    queryText,
-    results,
-    resultCount,
-    isExecuting,
-    isConnected,
-  } from "../lib/stores";
-  import { executeQuery } from "../lib/api";
+  import { createEventDispatcher } from "svelte";
 
-  async function handleExecute() {
-    const query = $queryText.trim();
-    if (!query || !$isConnected) return;
+  export let disabled = false;
+  export let isExecuting = false;
 
-    isExecuting.set(true);
-    results.set("Executing...");
-    resultCount.set("");
+  const dispatch = createEventDispatcher<{ execute: string }>();
 
-    try {
-      const result = await executeQuery(query);
-      results.set(result);
+  // Local state for the query text
+  let queryText = "g.V().limit(10)";
 
-      try {
-        const parsed = JSON.parse(result);
-        if (Array.isArray(parsed)) {
-          resultCount.set(`${parsed.length} result(s)`);
-        }
-      } catch {
-        // Not JSON, that's fine
-      }
-    } catch (e) {
-      results.set(`Error: ${e}`);
-      resultCount.set("");
-    } finally {
-      isExecuting.set(false);
+  function handleExecute() {
+    const query = queryText.trim();
+    if (query && !disabled && !isExecuting) {
+      dispatch("execute", query);
     }
   }
 
   function handleKeydown(e: KeyboardEvent) {
     if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
       e.preventDefault();
-      if ($isConnected) {
-        handleExecute();
-      }
+      handleExecute();
     }
   }
 </script>
@@ -51,13 +29,13 @@
     <h3>Query</h3>
     <button
       on:click={handleExecute}
-      disabled={!$isConnected || $isExecuting}
+      disabled={disabled || isExecuting}
     >
-      {$isExecuting ? "Executing..." : "Execute (Ctrl+Enter)"}
+      {isExecuting ? "Executing..." : "Execute (Ctrl+Enter)"}
     </button>
   </div>
   <textarea
-    bind:value={$queryText}
+    bind:value={queryText}
     on:keydown={handleKeydown}
     placeholder="g.V().limit(10)"
     spellcheck="false"
