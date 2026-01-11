@@ -20,7 +20,7 @@ This compiles TypeScript and bundles the frontend. Check for:
 ## Step 2: Rust Build
 
 ```bash
-cd src-tauri && cargo build
+cargo build --manifest-path src-tauri/Cargo.toml
 ```
 
 This compiles the Rust backend. Check for:
@@ -42,7 +42,7 @@ Run the Vitest test suite for Svelte components. Check for:
 ## Step 4: Rust Tests
 
 ```bash
-cd src-tauri && cargo test
+cargo test --manifest-path src-tauri/Cargo.toml
 ```
 
 Run the Rust test suite. Check for:
