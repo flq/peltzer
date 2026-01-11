@@ -1,14 +1,18 @@
 <script lang="ts">
   import { savedConnections } from "../lib/stores";
-  import { saveConnection, testConnection, getSavedConnections } from "../lib/api";
+  import { saveConnection, getSavedConnections } from "../lib/api";
   import type { ConnectionConfig } from "../lib/types";
+  import Button from "./Button.svelte";
+  import TestConnectionButton from "./TestConnectionButton.svelte";
 
-  let name = "";
-  let host = "localhost";
-  let port = 8182;
-  let username = "";
-  let password = "";
-  let useSsl = false;
+  let saving = $state(false);
+
+  let name = $state("");
+  let host = $state("localhost");
+  let port = $state(8182);
+  let username = $state("");
+  let password = $state("");
+  let useSsl = $state(false);
 
   export function fillForm(config: ConnectionConfig) {
     name = config.name;
@@ -31,20 +35,15 @@
   }
 
   async function handleSave() {
-    const config = getConfig();
-    await saveConnection(config);
-    const connections = await getSavedConnections();
-    savedConnections.set(connections);
-    clearForm();
-  }
-
-  async function handleTest() {
-    const config = getConfig();
+    saving = true;
     try {
-      const result = await testConnection(config);
-      alert(result);
-    } catch (e) {
-      alert(`Test failed: ${e}`);
+      const config = getConfig();
+      await saveConnection(config);
+      const connections = await getSavedConnections();
+      savedConnections.set(connections);
+      clearForm();
+    } finally {
+      saving = false;
     }
   }
 
@@ -58,7 +57,7 @@
   }
 </script>
 
-<form class="connection-form" on:submit|preventDefault={handleSave}>
+<form class="connection-form" onsubmit={(e) => { e.preventDefault(); handleSave(); }}>
   <label>
     Name
     <input type="text" bind:value={name} placeholder="My Database" required />
@@ -84,8 +83,8 @@
     Use SSL/TLS
   </label>
   <div class="form-actions">
-    <button type="button" on:click={handleTest}>Test</button>
-    <button type="submit">Save</button>
+    <TestConnectionButton config={getConfig()} />
+    <Button type="submit" pending={saving}>Save</Button>
   </div>
 </form>
 
@@ -123,7 +122,7 @@
     margin-top: 4px;
   }
 
-  .form-actions button {
+  .form-actions :global(button) {
     flex: 1;
   }
 </style>

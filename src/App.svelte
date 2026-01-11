@@ -2,6 +2,7 @@
   import { onMount } from "svelte";
   import Sidebar from "./components/Sidebar.svelte";
   import ExecutionPanel from "./components/ExecutionPanel.svelte";
+  import ToastContainer from "./components/ToastContainer.svelte";
   import {
     savedConnections,
     activeConnection,
@@ -29,6 +30,7 @@
   });
 </script>
 
+<ToastContainer />
 <div class="app-layout">
   <Sidebar />
   <ExecutionPanel />
