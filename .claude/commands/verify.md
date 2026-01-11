@@ -28,24 +28,31 @@ This compiles the Rust backend. Check for:
 - Borrow checker issues
 - Missing dependencies
 
-## Step 3: Run Tests (if they exist)
+## Step 3: Frontend Tests
 
-Check if tests exist and run them:
-
-**Frontend tests:**
 ```bash
-npm test 2>/dev/null || echo "No frontend tests configured"
+npm test
 ```
 
-**Rust tests:**
+Run the Vitest test suite for Svelte components. Check for:
+- Failing test assertions
+- Component rendering issues
+- Mock/stub problems
+
+## Step 4: Rust Tests
+
 ```bash
 cd src-tauri && cargo test
 ```
 
+Run the Rust test suite. Check for:
+- Failing test assertions
+- Integration test failures
+
 ## Reporting
 
-After all steps complete, report:
+After all steps complete (TypeScript build, Rust build, frontend tests, Rust tests), report:
 - **Success**: "All checks passed" with a summary of what was verified
 - **Failure**: Which step failed, the error message, and suggested fix
 
-If the build fails, do NOT proceed with other tasks until the issue is resolved.
+If any step fails, do NOT proceed with other tasks until the issue is resolved.

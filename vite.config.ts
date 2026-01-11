@@ -8,6 +8,25 @@ const host = process.env.TAURI_DEV_HOST;
 export default defineConfig(async () => ({
   plugins: [svelte()],
 
+  // Vitest configuration
+  test: {
+    globals: true,
+    environment: "jsdom",
+    setupFiles: ["./src/test/setup.ts"],
+    include: ["src/**/*.test.ts"],
+    // Force browser conditions to use Svelte's client-side bundle
+    server: {
+      deps: {
+        inline: [/svelte/],
+      },
+    },
+  },
+
+  // Resolve configuration for proper Svelte 5 support in tests
+  resolve: {
+    conditions: ["browser", "development"],
+  },
+
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   //
   // 1. prevent vite from obscuring rust errors
