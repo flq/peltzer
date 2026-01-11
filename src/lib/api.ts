@@ -1,6 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 import { Store } from "@tauri-apps/plugin-store";
-import { ConnectionConfig } from "./types";
+import type { ConnectionConfig } from "./types";
 
 let store: Store | null = null;
 
@@ -11,6 +11,7 @@ async function getStore(): Promise<Store> {
   return store;
 }
 
+// Connection persistence (store)
 export async function getSavedConnections(): Promise<ConnectionConfig[]> {
   const s = await getStore();
   const connections = await s.get<ConnectionConfig[]>("connections");
@@ -40,6 +41,7 @@ export async function deleteConnection(name: string): Promise<void> {
   await s.save();
 }
 
+// Connection management (Rust backend)
 export async function connect(config: ConnectionConfig): Promise<string> {
   return await invoke<string>("connect", { config });
 }
@@ -54,4 +56,9 @@ export async function getConnectionStatus(): Promise<ConnectionConfig | null> {
 
 export async function testConnection(config: ConnectionConfig): Promise<string> {
   return await invoke<string>("test_connection", { config });
+}
+
+// Query execution
+export async function executeQuery(query: string): Promise<string> {
+  return await invoke<string>("execute_query", { query });
 }

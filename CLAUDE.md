@@ -107,6 +107,7 @@ For manual testing: `npm run tauri dev` to launch the app.
 
 ## Future Features (Planned)
 
+- [ ] Docker dev environment (TinkerPop Gremlin Server for local testing)
 - [ ] Query history with persistence
 - [ ] Graph visualization
 - [ ] Schema/metadata exploration
