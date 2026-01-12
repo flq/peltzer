@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/svelte";
 import ExecutionPanel from "../ExecutionPanel.svelte";
-import { isConnected } from "../../lib/stores";
+import { activeConnection } from "../../lib/stores";
 import * as api from "../../lib/api";
 
 // Mock the API module
@@ -9,66 +9,68 @@ vi.mock("../../lib/api", () => ({
   executeQuery: vi.fn(),
 }));
 
+const defaultProps = {
+  ondisconnect: vi.fn(),
+};
+
+const mockConnection = { name: "Test", host: "localhost", port: 8182, use_ssl: false };
+
 describe("ExecutionPanel", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    // Reset store to disconnected state
-    isConnected.set(false);
+    activeConnection.set(null);
   });
 
   it("renders query pane and results pane", () => {
-    render(ExecutionPanel);
+    render(ExecutionPanel, { props: defaultProps });
 
     expect(screen.getByText("Query")).toBeInTheDocument();
     expect(screen.getByText("Results")).toBeInTheDocument();
   });
 
   it("disables execute button when not connected", () => {
-    isConnected.set(false);
-    render(ExecutionPanel);
+    activeConnection.set(null);
+    render(ExecutionPanel, { props: defaultProps });
 
     const button = screen.getByRole("button", { name: /execute/i });
     expect(button).toBeDisabled();
   });
 
   it("enables execute button when connected", async () => {
-    isConnected.set(true);
-    render(ExecutionPanel);
+    activeConnection.set(mockConnection);
+    render(ExecutionPanel, { props: defaultProps });
 
     const button = screen.getByRole("button", { name: /execute/i });
     expect(button).not.toBeDisabled();
   });
 
   it("shows executing state while query runs", async () => {
-    isConnected.set(true);
+    activeConnection.set(mockConnection);
 
-    // Make executeQuery hang until we resolve it
     let resolveQuery: (value: string) => void;
     vi.mocked(api.executeQuery).mockImplementation(
       () => new Promise((resolve) => { resolveQuery = resolve; })
     );
 
-    render(ExecutionPanel);
+    render(ExecutionPanel, { props: defaultProps });
 
     const button = screen.getByRole("button", { name: /execute/i });
     await fireEvent.click(button);
 
-    // Should show executing state - button shows "Executing..." and is disabled
-    const executingButton = screen.getByRole("button", { name: /executing/i });
-    expect(executingButton).toBeInTheDocument();
-    expect(executingButton).toBeDisabled();
+    // Button should be disabled and show spinner while executing
+    expect(button).toBeDisabled();
+    expect(document.querySelector(".spinner")).toBeInTheDocument();
 
-    // Resolve the query
     resolveQuery!('["result"]');
 
     await waitFor(() => {
-      // Button should no longer show "Executing..."
-      expect(screen.queryByRole("button", { name: /executing/i })).not.toBeInTheDocument();
+      expect(button).not.toBeDisabled();
+      expect(document.querySelector(".spinner")).not.toBeInTheDocument();
     });
   });
 
   it("displays query results on success", async () => {
-    isConnected.set(true);
+    activeConnection.set(mockConnection);
 
     const mockResult = JSON.stringify([
       { type: "vertex", id: 1, label: "person" },
@@ -77,7 +79,7 @@ describe("ExecutionPanel", () => {
 
     vi.mocked(api.executeQuery).mockResolvedValue(mockResult);
 
-    render(ExecutionPanel);
+    render(ExecutionPanel, { props: defaultProps });
 
     const button = screen.getByRole("button", { name: /execute/i });
     await fireEvent.click(button);
@@ -89,11 +91,11 @@ describe("ExecutionPanel", () => {
   });
 
   it("displays error message on failure", async () => {
-    isConnected.set(true);
+    activeConnection.set(mockConnection);
 
     vi.mocked(api.executeQuery).mockRejectedValue(new Error("Connection refused"));
 
-    render(ExecutionPanel);
+    render(ExecutionPanel, { props: defaultProps });
 
     const button = screen.getByRole("button", { name: /execute/i });
     await fireEvent.click(button);
@@ -104,27 +106,50 @@ describe("ExecutionPanel", () => {
   });
 
   it("handles non-JSON results without showing count", async () => {
-    isConnected.set(true);
+    activeConnection.set(mockConnection);
 
     vi.mocked(api.executeQuery).mockResolvedValue("plain text result");
 
-    render(ExecutionPanel);
+    render(ExecutionPanel, { props: defaultProps });
 
     const button = screen.getByRole("button", { name: /execute/i });
     await fireEvent.click(button);
 
     await waitFor(() => {
       expect(screen.getByText("plain text result")).toBeInTheDocument();
-      // Should not show result count for non-array results
       expect(screen.queryByText(/result\(s\)/)).not.toBeInTheDocument();
     });
   });
 
   it("does not execute query when not connected", async () => {
-    isConnected.set(false);
-    render(ExecutionPanel);
+    activeConnection.set(null);
+    render(ExecutionPanel, { props: defaultProps });
 
-    // Button should be disabled, but let's also verify API isn't called
     expect(api.executeQuery).not.toHaveBeenCalled();
+  });
+
+  it("calls ondisconnect when clicking disconnect button", async () => {
+    activeConnection.set(mockConnection);
+    const ondisconnect = vi.fn();
+    render(ExecutionPanel, { props: { ondisconnect } });
+
+    const disconnectButton = screen.getByRole("button", { name: /disconnect/i });
+    await fireEvent.click(disconnectButton);
+
+    expect(ondisconnect).toHaveBeenCalled();
+  });
+
+  it("executes query with Ctrl+Enter", async () => {
+    activeConnection.set(mockConnection);
+    vi.mocked(api.executeQuery).mockResolvedValue("[]");
+
+    render(ExecutionPanel, { props: defaultProps });
+
+    const textarea = screen.getByRole("textbox");
+    await fireEvent.keyDown(textarea, { key: "Enter", ctrlKey: true });
+
+    await waitFor(() => {
+      expect(api.executeQuery).toHaveBeenCalled();
+    });
   });
 });

@@ -1,32 +1,44 @@
 <script lang="ts">
-  import {
-    savedConnections,
-    isConnected,
-    connectionStatus,
-    activeConnection,
-  } from "../lib/stores";
-  import { connect, deleteConnection, getSavedConnections } from "../lib/api";
+  import { onMount } from "svelte";
+  import { savedConnections } from "../lib/stores";
+  import { getSavedConnections, deleteConnection } from "../lib/api";
   import type { ConnectionConfig } from "../lib/types";
   import Button from "../components/Button.svelte";
+  import Modal from "../components/Modal.svelte";
+  import ConnectionForm from "./ConnectionForm.svelte";
 
   interface Props {
-    onAddNew: () => void;
-    onEdit: (config: ConnectionConfig) => void;
+    onconnect: (config: ConnectionConfig) => void;
   }
 
-  let { onAddNew, onEdit }: Props = $props();
+  let { onconnect }: Props = $props();
 
-  async function handleConnect(config: ConnectionConfig) {
-    try {
-      connectionStatus.set("Connecting...");
-      const result = await connect(config);
-      isConnected.set(true);
-      activeConnection.set(config);
-      connectionStatus.set(result);
-    } catch (e) {
-      isConnected.set(false);
-      connectionStatus.set(`Error: ${e}`);
-    }
+  let showModal = $state(false);
+  let editingConnection = $state<ConnectionConfig | null>(null);
+
+  onMount(async () => {
+    const connections = await getSavedConnections();
+    savedConnections.set(connections);
+  });
+
+  function handleAddNew() {
+    editingConnection = null;
+    showModal = true;
+  }
+
+  function handleEdit(config: ConnectionConfig) {
+    editingConnection = config;
+    showModal = true;
+  }
+
+  function handleModalClose() {
+    showModal = false;
+    editingConnection = null;
+  }
+
+  function handleSave() {
+    showModal = false;
+    editingConnection = null;
   }
 
   async function handleDelete(name: string) {
@@ -36,20 +48,20 @@
   }
 </script>
 
-<div class="connection-picker">
-  <div class="picker-container">
+<div class="connections-panel">
+  <div class="panel-container">
     <h1>Connections</h1>
 
     {#if $savedConnections.length > 0}
       <div class="connection-list">
         {#each $savedConnections as conn (conn.name)}
           <div class="connection-item">
-            <button class="connection-name" onclick={() => handleConnect(conn)}>
+            <Button kind="bare" class="connection-name" onclick={() => onconnect(conn)}>
               {conn.name}
               <span class="connection-host">{conn.host}:{conn.port}</span>
-            </button>
+            </Button>
             <div class="connection-actions">
-              <Button kind="secondary" onclick={() => onEdit(conn)}>Edit</Button>
+              <Button kind="secondary" onclick={() => handleEdit(conn)}>Edit</Button>
               <Button kind="secondary" onclick={() => handleDelete(conn.name)}>Delete</Button>
             </div>
           </div>
@@ -59,12 +71,16 @@
       <p class="no-connections">No saved connections</p>
     {/if}
 
-    <Button onclick={onAddNew}>+ New Connection...</Button>
+    <Button onclick={handleAddNew}>+ New Connection...</Button>
   </div>
 </div>
 
+<Modal open={showModal} title={editingConnection ? "Edit Connection" : "New Connection"} onclose={handleModalClose}>
+  <ConnectionForm editConfig={editingConnection} onsave={handleSave} />
+</Modal>
+
 <style>
-  .connection-picker {
+  .connections-panel {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -72,7 +88,7 @@
     padding: 24px;
   }
 
-  .picker-container {
+  .panel-container {
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -103,24 +119,18 @@
     border-radius: 6px;
   }
 
-  .connection-name {
+  .connection-item :global(.connection-name) {
     flex: 1;
-    display: flex;
     flex-direction: column;
     align-items: flex-start;
     gap: 2px;
-    background: transparent;
-    border: none;
     color: var(--text-primary);
     font-weight: 500;
-    cursor: pointer;
-    padding: 0;
     text-align: left;
   }
 
-  .connection-name:hover {
+  .connection-item :global(.connection-name:hover) {
     color: var(--accent);
-    background: transparent;
   }
 
   .connection-host {

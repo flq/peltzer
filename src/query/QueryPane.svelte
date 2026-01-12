@@ -1,18 +1,21 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
+  import Button from "../components/Button.svelte";
 
-  export let disabled = false;
-  export let isExecuting = false;
+  interface Props {
+    disabled?: boolean;
+    isExecuting?: boolean;
+    onexecute: (query: string) => void;
+    ondisconnect: () => void;
+  }
 
-  const dispatch = createEventDispatcher<{ execute: string }>();
+  let { disabled = false, isExecuting = false, onexecute, ondisconnect }: Props = $props();
 
-  // Local state for the query text
-  let queryText = "g.V().limit(10)";
+  let queryText = $state("g.V().limit(10)");
 
   function handleExecute() {
     const query = queryText.trim();
     if (query && !disabled && !isExecuting) {
-      dispatch("execute", query);
+      onexecute(query);
     }
   }
 
@@ -27,16 +30,22 @@
 <div class="query-section">
   <div class="query-header">
     <h3>Query</h3>
-    <button
-      on:click={handleExecute}
-      disabled={disabled || isExecuting}
-    >
-      {isExecuting ? "Executing..." : "Execute (Ctrl+Enter)"}
-    </button>
+    <div class="query-actions">
+      <Button
+        onclick={handleExecute}
+        disabled={disabled || isExecuting}
+        pending={isExecuting}
+      >
+        Execute (Ctrl+Enter)
+      </Button>
+      <Button kind="secondary" onclick={ondisconnect}>
+        Disconnect
+      </Button>
+    </div>
   </div>
   <textarea
     bind:value={queryText}
-    on:keydown={handleKeydown}
+    onkeydown={handleKeydown}
     placeholder="g.V().limit(10)"
     spellcheck="false"
   ></textarea>
@@ -67,6 +76,11 @@
     letter-spacing: 0.5px;
     color: var(--text-secondary);
     margin: 0;
+  }
+
+  .query-actions {
+    display: flex;
+    gap: 8px;
   }
 
   textarea {

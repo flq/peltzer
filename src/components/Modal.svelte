@@ -1,13 +1,15 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
+  import Button from "./Button.svelte";
 
   interface Props {
     open: boolean;
+    title: string;
     onclose: () => void;
     children: Snippet;
   }
 
-  let { open, onclose, children }: Props = $props();
+  let { open, title, onclose, children }: Props = $props();
   let dialog: HTMLDialogElement;
 
   $effect(() => {
@@ -35,7 +37,10 @@
   onclick={handleBackdropClick}
 >
   <div class="modal-content">
-    <button class="close-button" onclick={onclose} type="button">×</button>
+    <header class="modal-header">
+      <h2>{title}</h2>
+      <Button kind="bare" class="close-button" onclick={onclose} type="button">×</Button>
+    </header>
     {@render children()}
   </div>
 </dialog>
@@ -46,9 +51,10 @@
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 0;
-    min-width: 400px;
+    min-width: 500px;
     max-width: 90vw;
     color: var(--text-primary);
+    margin: auto;
   }
 
   dialog::backdrop {
@@ -56,25 +62,30 @@
   }
 
   .modal-content {
-    position: relative;
     padding: 24px;
   }
 
-  .close-button {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    background: transparent;
-    border: none;
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .modal-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .modal-header :global(.close-button) {
     color: var(--text-secondary);
     font-size: 20px;
-    cursor: pointer;
     padding: 4px 8px;
     line-height: 1;
   }
 
-  .close-button:hover {
+  .modal-header :global(.close-button:hover) {
     color: var(--text-primary);
-    background: transparent;
   }
 </style>

@@ -12,10 +12,10 @@
     children: Snippet;
   }
 
-  let { pending = false, kind = "primary", size = "normal", children, ...rest }: Props = $props();
+  let { pending = false, kind = "primary", size = "normal", children, onclick, class: className, ...rest }: Props = $props();
 </script>
 
-<button class="kind-{kind} size-{size}" {...rest} disabled={pending || rest.disabled}>
+<button class="kind-{kind} size-{size} {className ?? ''}" {onclick} {...rest} disabled={pending || rest.disabled}>
   {#if pending}
     <span class="spinner"></span>
   {/if}
@@ -31,6 +31,19 @@
     align-items: center;
     justify-content: center;
     gap: 6px;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    padding: 6px 12px;
+    font-size: 13px;
+    font-family: inherit;
+    font-weight: 500;
+    cursor: pointer;
+    background: none;
+  }
+
+  button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 
   /* Primary - default accent background */

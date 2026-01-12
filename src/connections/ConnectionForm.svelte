@@ -56,7 +56,6 @@
 </script>
 
 <form class="connection-form" onsubmit={(e) => { e.preventDefault(); handleSave(); }}>
-  <h2>{editConfig ? "Edit Connection" : "New Connection"}</h2>
   <label>
     Name
     <input type="text" bind:value={name} placeholder="My Database" required />
@@ -92,13 +91,6 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
-  }
-
-  .connection-form h2 {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 8px;
   }
 
   .connection-form label {

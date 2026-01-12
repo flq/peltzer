@@ -4,12 +4,17 @@
   import { executeQuery } from "../lib/api";
   import { isConnected } from "../lib/stores";
 
-  let isExecuting = false;
-  let results = "";
-  let resultCount = "";
+  interface Props {
+    ondisconnect: () => void;
+  }
 
-  async function handleExecute(event: CustomEvent<string>) {
-    const query = event.detail;
+  let { ondisconnect }: Props = $props();
+
+  let isExecuting = $state(false);
+  let results = $state("");
+  let resultCount = $state("");
+
+  async function handleExecute(query: string) {
     if (!query || !$isConnected) return;
 
     isExecuting = true;
@@ -41,7 +46,8 @@
   <QueryPane
     disabled={!$isConnected}
     {isExecuting}
-    on:execute={handleExecute}
+    onexecute={handleExecute}
+    {ondisconnect}
   />
   <ResultsPane {results} {resultCount} />
 </div>

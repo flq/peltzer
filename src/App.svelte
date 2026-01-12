@@ -1,79 +1,34 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-  import ConnectionPicker from "./connections/ConnectionPicker.svelte";
-  import ConnectionForm from "./connections/ConnectionForm.svelte";
-  import TabBar from "./components/TabBar.svelte";
+  import ConnectionsPanel from "./connections/ConnectionsPanel.svelte";
   import ExecutionPanel from "./query/ExecutionPanel.svelte";
-  import Modal from "./components/Modal.svelte";
   import ToastContainer from "./components/ToastContainer.svelte";
-  import {
-    savedConnections,
-    activeConnection,
-    isConnected,
-    connectionStatus,
-  } from "./lib/stores";
-  import { getSavedConnections, getConnectionStatus } from "./lib/api";
+  import { activeConnection, isConnected } from "./lib/stores";
+  import { connect, disconnect } from "./lib/api";
   import type { ConnectionConfig } from "./lib/types";
 
-  let showConnectionModal = $state(false);
-  let editingConnection = $state<ConnectionConfig | null>(null);
-
-  onMount(async () => {
-    const connections = await getSavedConnections();
-    savedConnections.set(connections);
-
+  async function handleConnect(config: ConnectionConfig) {
     try {
-      const status = await getConnectionStatus();
-      if (status) {
-        activeConnection.set(status);
-        isConnected.set(true);
-        connectionStatus.set(`Connected to ${status.host}:${status.port}`);
-      }
-    } catch {
-      // Not connected
+      await connect(config);
+      activeConnection.set(config);
+    } catch (e) {
+      activeConnection.set(null);
     }
-  });
-
-  function handleAddNew() {
-    editingConnection = null;
-    showConnectionModal = true;
   }
 
-  function handleEdit(config: ConnectionConfig) {
-    editingConnection = config;
-    showConnectionModal = true;
-  }
-
-  function handleModalClose() {
-    showConnectionModal = false;
-    editingConnection = null;
-  }
-
-  function handleSave() {
-    showConnectionModal = false;
-    editingConnection = null;
+  async function handleDisconnect() {
+    try {
+      await disconnect();
+      activeConnection.set(null);
+    } catch (e) {
+      console.error("Disconnect error:", e);
+    }
   }
 </script>
 
 <ToastContainer />
 
 {#if $isConnected}
-  <div class="app-layout">
-    <TabBar />
-    <ExecutionPanel />
-  </div>
+  <ExecutionPanel ondisconnect={handleDisconnect} />
 {:else}
-  <ConnectionPicker onAddNew={handleAddNew} onEdit={handleEdit} />
+  <ConnectionsPanel onconnect={handleConnect} />
 {/if}
-
-<Modal open={showConnectionModal} onclose={handleModalClose}>
-  <ConnectionForm editConfig={editingConnection} onsave={handleSave} />
-</Modal>
-
-<style>
-  .app-layout {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-  }
-</style>
