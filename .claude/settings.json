@@ -22,7 +22,8 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:crates.io)",
       "Skill(verify)",
-      "Skill(backlog)"
+      "Skill(backlog)",
+      "Edit(BACKLOG.md)"
     ]
   }
 }
