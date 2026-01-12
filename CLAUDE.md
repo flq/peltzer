@@ -75,9 +75,3 @@ Use `/verify` after code changes to run all builds and tests.
 - JanusGraph (WebSocket, optional auth)
 - Azure CosmosDB Gremlin API
 - TinkerPop Server (local dev)
-
-## Future Work
-
-- Query history
-- Graph visualization
-- Schema exploration
