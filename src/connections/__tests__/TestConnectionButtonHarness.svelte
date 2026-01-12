@@ -1,6 +1,6 @@
 <script lang="ts">
   import TestConnectionButton from "../TestConnectionButton.svelte";
-  import ToastContainer from "../ToastContainer.svelte";
+  import ToastContainer from "../../components/ToastContainer.svelte";
   import type { ConnectionConfig } from "../../lib/types";
 
   const config: ConnectionConfig = {

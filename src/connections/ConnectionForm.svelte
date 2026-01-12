@@ -2,8 +2,15 @@
   import { savedConnections } from "../lib/stores";
   import { saveConnection, getSavedConnections } from "../lib/api";
   import type { ConnectionConfig } from "../lib/types";
-  import Button from "./Button.svelte";
+  import Button from "../components/Button.svelte";
   import TestConnectionButton from "./TestConnectionButton.svelte";
+
+  interface Props {
+    editConfig?: ConnectionConfig | null;
+    onsave?: () => void;
+  }
+
+  let { editConfig = null, onsave }: Props = $props();
 
   let saving = $state(false);
 
@@ -14,14 +21,14 @@
   let password = $state("");
   let useSsl = $state(false);
 
-  export function fillForm(config: ConnectionConfig) {
-    name = config.name;
-    host = config.host;
-    port = config.port;
-    username = config.username ?? "";
-    password = config.password ?? "";
-    useSsl = config.use_ssl;
-  }
+  $effect(() => {
+    name = editConfig?.name ?? "";
+    host = editConfig?.host ?? "localhost";
+    port = editConfig?.port ?? 8182;
+    username = editConfig?.username ?? "";
+    password = editConfig?.password ?? "";
+    useSsl = editConfig?.use_ssl ?? false;
+  });
 
   function getConfig(): ConnectionConfig {
     return {
@@ -41,23 +48,15 @@
       await saveConnection(config);
       const connections = await getSavedConnections();
       savedConnections.set(connections);
-      clearForm();
+      onsave?.();
     } finally {
       saving = false;
     }
   }
-
-  function clearForm() {
-    name = "";
-    host = "localhost";
-    port = 8182;
-    username = "";
-    password = "";
-    useSsl = false;
-  }
 </script>
 
 <form class="connection-form" onsubmit={(e) => { e.preventDefault(); handleSave(); }}>
+  <h2>{editConfig ? "Edit Connection" : "New Connection"}</h2>
   <label>
     Name
     <input type="text" bind:value={name} placeholder="My Database" required />
@@ -90,10 +89,16 @@
 
 <style>
   .connection-form {
-    padding: 0 16px 16px;
     display: flex;
     flex-direction: column;
     gap: 12px;
+  }
+
+  .connection-form h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
   }
 
   .connection-form label {

@@ -2,7 +2,7 @@
   import { testConnection } from "../lib/api";
   import { toast } from "../lib/toastStore";
   import type { ConnectionConfig } from "../lib/types";
-  import Button from "./Button.svelte";
+  import Button from "../components/Button.svelte";
 
   interface Props {
     config: ConnectionConfig;
