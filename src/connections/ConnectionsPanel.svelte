@@ -58,7 +58,13 @@
           <div class="connection-item">
             <Button kind="bare" class="connection-name" onclick={() => onconnect(conn)}>
               {conn.name}
-              <span class="connection-host">{conn.host}:{conn.port}</span>
+              <span class="connection-host">
+                {#if conn.type === "cosmos"}
+                  {conn.endpoint}/{conn.database}
+                {:else}
+                  {conn.host}:{conn.port}
+                {/if}
+              </span>
             </Button>
             <div class="connection-actions">
               <Button kind="secondary" onclick={() => handleEdit(conn)}>Edit</Button>

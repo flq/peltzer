@@ -4,6 +4,7 @@
   import type { ConnectionConfig } from "../../lib/types";
 
   const config: ConnectionConfig = {
+    type: "standard",
     name: "Test DB",
     host: "localhost",
     port: 8182,

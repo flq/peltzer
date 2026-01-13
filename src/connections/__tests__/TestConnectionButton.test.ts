@@ -77,6 +77,7 @@ describe("TestConnectionButton", () => {
 
     await waitFor(() => {
       expect(api.testConnection).toHaveBeenCalledWith({
+        type: "standard",
         name: "Test DB",
         host: "localhost",
         port: 8182,

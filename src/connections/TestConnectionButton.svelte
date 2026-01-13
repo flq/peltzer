@@ -5,13 +5,14 @@
   import Button from "../components/Button.svelte";
 
   interface Props {
-    config: ConnectionConfig;
+    config: ConnectionConfig | null;
   }
 
   let { config }: Props = $props();
   let testing = $state(false);
 
   async function handleTest() {
+    if (!config) return;
     testing = true;
     try {
       const result = await testConnection(config);
@@ -24,4 +25,4 @@
   }
 </script>
 
-<Button type="button" kind="secondary" pending={testing} onclick={handleTest}>Test</Button>
+<Button type="button" kind="secondary" pending={testing} onclick={handleTest} disabled={!config}>Test</Button>

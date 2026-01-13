@@ -4,6 +4,8 @@
   import type { ConnectionConfig } from "../lib/types";
   import Button from "../components/Button.svelte";
   import TestConnectionButton from "./TestConnectionButton.svelte";
+  import StandardConnectionFields from "./StandardConnectionFields.svelte";
+  import CosmosConnectionFields from "./CosmosConnectionFields.svelte";
 
   interface Props {
     editConfig?: ConnectionConfig | null;
@@ -13,39 +15,28 @@
   let { editConfig = null, onsave }: Props = $props();
 
   let saving = $state(false);
+  let selectedType = $state<"standard" | "cosmos" | null>(null);
+  let currentConfig = $state<ConnectionConfig | null>(null);
 
-  let name = $state("");
-  let host = $state("localhost");
-  let port = $state(8182);
-  let username = $state("");
-  let password = $state("");
-  let useSsl = $state(false);
-
+  // Update selectedType when editConfig changes (e.g., when opening edit modal)
   $effect(() => {
-    name = editConfig?.name ?? "";
-    host = editConfig?.host ?? "localhost";
-    port = editConfig?.port ?? 8182;
-    username = editConfig?.username ?? "";
-    password = editConfig?.password ?? "";
-    useSsl = editConfig?.use_ssl ?? false;
+    selectedType = editConfig?.type ?? null;
   });
 
-  function getConfig(): ConnectionConfig {
-    return {
-      name,
-      host,
-      port,
-      username: username || undefined,
-      password: password || undefined,
-      use_ssl: useSsl,
-    };
+  function selectType(type: "standard" | "cosmos") {
+    selectedType = type;
+  }
+
+  function handleConfigChange(config: ConnectionConfig) {
+    currentConfig = config;
   }
 
   async function handleSave() {
+    if (!currentConfig) return;
+
     saving = true;
     try {
-      const config = getConfig();
-      await saveConnection(config);
+      await saveConnection(currentConfig);
       const connections = await getSavedConnections();
       savedConnections.set(connections);
       onsave?.();
@@ -55,62 +46,61 @@
   }
 </script>
 
-<form class="connection-form" onsubmit={(e) => { e.preventDefault(); handleSave(); }}>
-  <label>
-    Name
-    <input type="text" bind:value={name} placeholder="My Database" required />
-  </label>
-  <label>
-    Host
-    <input type="text" bind:value={host} placeholder="localhost" required />
-  </label>
-  <label>
-    Port
-    <input type="number" bind:value={port} required />
-  </label>
-  <label>
-    Username
-    <input type="text" bind:value={username} placeholder="(optional)" />
-  </label>
-  <label>
-    Password
-    <input type="password" bind:value={password} placeholder="(optional)" />
-  </label>
-  <label class="checkbox-label">
-    <input type="checkbox" bind:checked={useSsl} />
-    Use SSL/TLS
-  </label>
-  <div class="form-actions">
-    <TestConnectionButton config={getConfig()} />
-    <Button type="submit" pending={saving}>Save</Button>
+{#if selectedType === null}
+  <div class="type-selector">
+    <p class="type-prompt">Select connection type:</p>
+    <div class="type-buttons">
+      <Button kind="secondary" onclick={() => selectType("standard")}>Standard</Button>
+      <Button kind="secondary" onclick={() => selectType("cosmos")}>Cosmos DB</Button>
+    </div>
   </div>
-</form>
+{:else}
+  <form class="connection-form" onsubmit={(e) => { e.preventDefault(); handleSave(); }}>
+    {#if selectedType === "standard"}
+      <StandardConnectionFields
+        initial={editConfig?.type === "standard" ? editConfig : null}
+        onchange={handleConfigChange}
+      />
+    {:else if selectedType === "cosmos"}
+      <CosmosConnectionFields
+        initial={editConfig?.type === "cosmos" ? editConfig : null}
+        onchange={handleConfigChange}
+      />
+    {/if}
+
+    <div class="form-actions">
+      <TestConnectionButton config={currentConfig} />
+      <Button type="submit" pending={saving}>Save</Button>
+    </div>
+  </form>
+{/if}
 
 <style>
-  .connection-form {
+  .type-selector {
     display: flex;
     flex-direction: column;
     gap: 12px;
   }
 
-  .connection-form label {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+  .type-prompt {
     font-size: 12px;
     color: var(--text-secondary);
+    margin: 0;
   }
 
-  .connection-form label.checkbox-label {
-    flex-direction: row;
-    align-items: center;
+  .type-buttons {
+    display: flex;
     gap: 8px;
   }
 
-  .connection-form input[type="text"],
-  .connection-form input[type="password"],
-  .connection-form input[type="number"] {
-    width: 100%;
+  .type-buttons :global(button) {
+    flex: 1;
+  }
+
+  .connection-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
   }
 
   .form-actions {

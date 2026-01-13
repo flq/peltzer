@@ -4,33 +4,74 @@ use std::sync::Arc;
 use tokio::sync::Mutex;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ConnectionConfig {
-    pub name: String,
-    pub host: String,
-    pub port: u16,
-    #[serde(default)]
-    pub username: Option<String>,
-    #[serde(default)]
-    pub password: Option<String>,
-    #[serde(default)]
-    pub use_ssl: bool,
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum ConnectionConfig {
+    Standard {
+        name: String,
+        host: String,
+        port: u16,
+        #[serde(default)]
+        username: Option<String>,
+        #[serde(default)]
+        password: Option<String>,
+        #[serde(default)]
+        use_ssl: bool,
+    },
+    Cosmos {
+        name: String,
+        endpoint: String,
+        database: String,
+        container: String,
+        key: String,
+    },
 }
 
 impl ConnectionConfig {
-    pub fn to_connection_options(&self) -> ConnectionOptions {
-        let mut builder = ConnectionOptions::builder()
-            .host(&self.host)
-            .port(self.port);
-
-        if let (Some(user), Some(pass)) = (&self.username, &self.password) {
-            builder = builder.credentials(user, pass);
+    pub fn name(&self) -> &str {
+        match self {
+            ConnectionConfig::Standard { name, .. } => name,
+            ConnectionConfig::Cosmos { name, .. } => name,
         }
+    }
 
-        if self.use_ssl {
-            builder = builder.ssl(true);
+    pub fn display_info(&self) -> String {
+        match self {
+            ConnectionConfig::Standard { host, port, .. } => format!("{}:{}", host, port),
+            ConnectionConfig::Cosmos {
+                endpoint,
+                database,
+                container,
+                ..
+            } => format!("{}/{}/{}", endpoint, database, container),
         }
+    }
 
-        builder.build()
+    pub fn to_connection_options(&self) -> Result<ConnectionOptions, String> {
+        match self {
+            ConnectionConfig::Standard {
+                host,
+                port,
+                username,
+                password,
+                use_ssl,
+                ..
+            } => {
+                let mut builder = ConnectionOptions::builder().host(host).port(*port);
+
+                if let (Some(user), Some(pass)) = (username, password) {
+                    builder = builder.credentials(user, pass);
+                }
+
+                if *use_ssl {
+                    builder = builder.ssl(true);
+                }
+
+                Ok(builder.build())
+            }
+            ConnectionConfig::Cosmos { .. } => {
+                Err("CosmosDB connections are not yet supported. The gremlin-client library requires a patch to support custom WebSocket paths.".to_string())
+            }
+        }
     }
 }
 
@@ -59,17 +100,18 @@ pub async fn connect(
     config: ConnectionConfig,
     state: tauri::State<'_, SharedConnectionState>,
 ) -> Result<String, String> {
-    let opts = config.to_connection_options();
+    let opts = config.to_connection_options()?;
 
     let client = GremlinClient::connect(opts)
         .await
         .map_err(|e| format!("Connection failed: {}", e))?;
 
+    let display = config.display_info();
     let mut state = state.lock().await;
     state.client = Some(client);
-    state.config = Some(config.clone());
+    state.config = Some(config);
 
-    Ok(format!("Connected to {}:{}", config.host, config.port))
+    Ok(format!("Connected to {}", display))
 }
 
 #[tauri::command]
@@ -96,7 +138,7 @@ pub async fn get_connection_status(
 
 #[tauri::command]
 pub async fn test_connection(config: ConnectionConfig) -> Result<String, String> {
-    let opts = config.to_connection_options();
+    let opts = config.to_connection_options()?;
 
     let client = GremlinClient::connect(opts)
         .await
