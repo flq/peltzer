@@ -10,7 +10,12 @@
     port: 8182,
     use_ssl: false,
   };
+
+  let error = $state<string | null>(null);
 </script>
 
 <ToastContainer />
-<TestConnectionButton {config} />
+{#if error}
+  <div class="test-error">{error}</div>
+{/if}
+<TestConnectionButton {config} onerror={(e) => error = e} />

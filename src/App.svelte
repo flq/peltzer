@@ -28,7 +28,7 @@
 <ToastContainer />
 
 {#if $isConnected}
-  <ExecutionPanel ondisconnect={handleDisconnect} />
+  <ExecutionPanel onDisconnect={handleDisconnect} />
 {:else}
   <ConnectionsPanel onconnect={handleConnect} />
 {/if}

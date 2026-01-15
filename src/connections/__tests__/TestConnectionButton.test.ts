@@ -54,7 +54,7 @@ describe("TestConnectionButton", () => {
     });
   });
 
-  it("shows error toast on failed connection", async () => {
+  it("shows error inline on failed connection", async () => {
     vi.mocked(api.testConnection).mockRejectedValue(new Error("Connection refused"));
 
     render(TestConnectionButtonHarness);
@@ -63,7 +63,7 @@ describe("TestConnectionButton", () => {
     await fireEvent.click(button);
 
     await waitFor(() => {
-      expect(screen.getByText(/Test failed:.*Connection refused/)).toBeInTheDocument();
+      expect(screen.getByText(/Connection refused/)).toBeInTheDocument();
     });
   });
 

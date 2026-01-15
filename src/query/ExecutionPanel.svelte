@@ -5,10 +5,10 @@
   import { isConnected } from "../lib/stores";
 
   interface Props {
-    ondisconnect: () => void;
+    onDisconnect: () => void;
   }
 
-  let { ondisconnect }: Props = $props();
+  let { onDisconnect }: Props = $props();
 
   let isExecuting = $state(false);
   let results = $state("");
@@ -47,14 +47,14 @@
     disabled={!$isConnected}
     {isExecuting}
     onexecute={handleExecute}
-    {ondisconnect}
+    {onDisconnect}
   />
   <ResultsPane {results} {resultCount} />
 </div>
 
 <style>
   .execution-panel {
-    flex: 1;
+    height: 100%;
     display: flex;
     flex-direction: column;
     overflow: hidden;

@@ -5,10 +5,10 @@
     disabled?: boolean;
     isExecuting?: boolean;
     onexecute: (query: string) => void;
-    ondisconnect: () => void;
+    onDisconnect: () => void;
   }
 
-  let { disabled = false, isExecuting = false, onexecute, ondisconnect }: Props = $props();
+  let { disabled = false, isExecuting = false, onexecute, onDisconnect }: Props = $props();
 
   let queryText = $state("g.V().limit(10)");
 
@@ -38,7 +38,7 @@
       >
         Execute (Ctrl+Enter)
       </Button>
-      <Button kind="secondary" onclick={ondisconnect}>
+      <Button kind="secondary" onclick={onDisconnect}>
         Disconnect
       </Button>
     </div>
@@ -55,8 +55,7 @@
   .query-section {
     display: flex;
     flex-direction: column;
-    height: 40%;
-    min-height: 150px;
+    flex-shrink: 0;
     border-bottom: 1px solid var(--border-color);
   }
 
@@ -84,13 +83,15 @@
   }
 
   textarea {
-    flex: 1;
     width: 100%;
+    height: 150px;
+    min-height: 80px;
+    max-height: 70vh;
     padding: 16px;
     background-color: var(--bg-primary);
     color: var(--text-primary);
     border: none;
-    resize: none;
+    resize: vertical;
     font-family: inherit;
     font-size: 14px;
     line-height: 1.6;

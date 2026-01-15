@@ -10,7 +10,7 @@ vi.mock("../../lib/api", () => ({
 }));
 
 const defaultProps = {
-  ondisconnect: vi.fn(),
+  onDisconnect: vi.fn(),
 };
 
 const mockConnection = { name: "Test", host: "localhost", port: 8182, use_ssl: false };
@@ -128,15 +128,15 @@ describe("ExecutionPanel", () => {
     expect(api.executeQuery).not.toHaveBeenCalled();
   });
 
-  it("calls ondisconnect when clicking disconnect button", async () => {
+  it("calls onDisconnect when clicking disconnect button", async () => {
     activeConnection.set(mockConnection);
-    const ondisconnect = vi.fn();
-    render(ExecutionPanel, { props: { ondisconnect } });
+    const onDisconnect = vi.fn();
+    render(ExecutionPanel, { props: { onDisconnect } });
 
     const disconnectButton = screen.getByRole("button", { name: /disconnect/i });
     await fireEvent.click(disconnectButton);
 
-    expect(ondisconnect).toHaveBeenCalled();
+    expect(onDisconnect).toHaveBeenCalled();
   });
 
   it("executes query with Ctrl+Enter", async () => {
