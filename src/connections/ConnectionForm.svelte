@@ -17,6 +17,7 @@
   let saving = $state(false);
   let selectedType = $state<"standard" | "cosmos" | null>(null);
   let currentConfig = $state<ConnectionConfig | null>(null);
+  let testError = $state<string | null>(null);
 
   // Update selectedType when editConfig changes (e.g., when opening edit modal)
   $effect(() => {
@@ -29,6 +30,11 @@
 
   function handleConfigChange(config: ConnectionConfig) {
     currentConfig = config;
+    testError = null;
+  }
+
+  function handleTestError(error: string | null) {
+    testError = error;
   }
 
   async function handleSave() {
@@ -68,8 +74,12 @@
       />
     {/if}
 
+    {#if testError}
+      <div class="test-error">{testError}</div>
+    {/if}
+
     <div class="form-actions">
-      <TestConnectionButton config={currentConfig} />
+      <TestConnectionButton config={currentConfig} onerror={handleTestError} />
       <Button type="submit" pending={saving}>Save</Button>
     </div>
   </form>
@@ -111,5 +121,14 @@
 
   .form-actions :global(button) {
     flex: 1;
+  }
+
+  .test-error {
+    padding: 10px 12px;
+    background-color: #fef3c7;
+    border: 1px solid #f59e0b;
+    border-radius: 4px;
+    color: #92400e;
+    font-size: 13px;
   }
 </style>

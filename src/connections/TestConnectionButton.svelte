@@ -6,19 +6,21 @@
 
   interface Props {
     config: ConnectionConfig | null;
+    onerror?: (error: string | null) => void;
   }
 
-  let { config }: Props = $props();
+  let { config, onerror }: Props = $props();
   let testing = $state(false);
 
   async function handleTest() {
     if (!config) return;
     testing = true;
+    onerror?.(null);
     try {
       const result = await testConnection(config);
       toast(result, "success");
     } catch (e) {
-      toast(`Test failed: ${e}`, "error");
+      onerror?.(`${e}`);
     } finally {
       testing = false;
     }

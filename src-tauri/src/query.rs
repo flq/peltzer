@@ -17,6 +17,8 @@ fn gkey_to_string(key: &GKey) -> String {
         GKey::Token(t) => t.value().to_string(),
         GKey::Vertex(v) => format!("vertex:{}", gid_to_json(v.id())),
         GKey::Edge(e) => format!("edge:{}", gid_to_json(e.id())),
+        GKey::T(t) => format!("{:?}", t),
+        GKey::Direction(d) => format!("{:?}", d),
     }
 }
 

@@ -1,4 +1,4 @@
-use gremlin_client::{aio::GremlinClient, ConnectionOptions};
+use gremlin_client::{aio::GremlinClient, ConnectionOptions, GraphSON};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use tokio::sync::Mutex;
@@ -68,8 +68,26 @@ impl ConnectionConfig {
 
                 Ok(builder.build())
             }
-            ConnectionConfig::Cosmos { .. } => {
-                Err("CosmosDB connections are not yet supported. The gremlin-client library requires a patch to support custom WebSocket paths.".to_string())
+            ConnectionConfig::Cosmos {
+                endpoint,
+                database,
+                container,
+                key,
+                ..
+            } => {
+                // CosmosDB uses "/" as the WebSocket path (not "/gremlin")
+                // Username format: /dbs/<database>/colls/<container>
+                // CosmosDB only supports GraphSON v2
+                let username = format!("/dbs/{}/colls/{}", database, container);
+                Ok(ConnectionOptions::builder()
+                    .host(endpoint)
+                    .port(443)
+                    .ssl(true)
+                    .path("/")
+                    .credentials(&username, key)
+                    .serializer(GraphSON::V2)
+                    .deserializer(GraphSON::V2)
+                    .build())
             }
         }
     }

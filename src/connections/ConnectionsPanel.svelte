@@ -133,6 +133,7 @@
     color: var(--text-primary);
     font-weight: 500;
     text-align: left;
+    overflow: hidden;
   }
 
   .connection-item :global(.connection-name:hover) {
@@ -140,14 +141,20 @@
   }
 
   .connection-host {
+    display: block;
+    width: 100%;
     font-size: 12px;
     font-weight: 400;
     color: var(--text-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .connection-actions {
     display: flex;
     gap: 8px;
+    flex-shrink: 0;
   }
 
   .no-connections {
