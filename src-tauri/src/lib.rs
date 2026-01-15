@@ -1,4 +1,5 @@
 mod connection;
+mod connection_config;
 mod query;
 
 use connection::{connect, disconnect, get_connection_status, test_connection};
