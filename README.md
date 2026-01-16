@@ -2,6 +2,18 @@
 
 Randall Peltzer was the dude that found Mogwai, who was then father to many gremlins. Goddit?
 
+## Prerequisites
+
+- Node.js 20+
+- Rust / Cargo ([install](https://rustup.rs/))
+- Docker (for local TinkerPop server)
+
+## Tech Stack
+
+- **Desktop**: Tauri v2
+- **Frontend**: Svelte 5, TypeScript
+- **Backend**: Rust, gremlin-rs
+
 ## How to run the app in development
 
 ### 1. Start the database
