@@ -63,23 +63,19 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 16px;
+    padding: var(--spacer-05) var(--spacer-1);
     background-color: var(--bg-secondary);
     border-bottom: 1px solid var(--border-color);
   }
 
   .query-header h3 {
-    font-size: 12px;
-    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
     color: var(--text-secondary);
-    margin: 0;
   }
 
   .query-actions {
     display: flex;
-    gap: 8px;
+    gap: var(--spacer-05);
   }
 
   textarea {
@@ -87,13 +83,13 @@
     height: 150px;
     min-height: 80px;
     max-height: 70vh;
-    padding: 16px;
+    padding: var(--spacer-1);
     background-color: var(--bg-primary);
     color: var(--text-primary);
     border: none;
     resize: vertical;
     font-family: inherit;
-    font-size: 14px;
+    font-size: var(--font-size-normal);
     line-height: 1.6;
   }
 

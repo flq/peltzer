@@ -23,34 +23,27 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 16px;
+    padding: var(--spacer-05) var(--spacer-1);
     background-color: var(--bg-secondary);
     border-bottom: 1px solid var(--border-color);
   }
 
   .results-header h3 {
-    font-size: 12px;
-    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
     color: var(--text-secondary);
-    margin: 0;
   }
 
   .result-count {
-    font-size: 11px;
     color: var(--text-secondary);
   }
 
   .results-output {
     flex: 1;
     margin: 0;
-    padding: 16px;
+    padding: var(--spacer-1);
     background-color: var(--bg-primary);
     color: var(--text-primary);
     overflow: auto;
-    font-size: 13px;
-    line-height: 1.6;
     white-space: pre-wrap;
     word-break: break-word;
   }
