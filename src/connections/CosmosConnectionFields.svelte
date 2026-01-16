@@ -8,7 +8,7 @@
 
     let {initial = null, onchange}: Props = $props();
 
-    let localValues = $state($state.snapshot((() => initial)()) ?? {
+    let localValues = $state((() => initial)() ?? {
         type: "cosmos",
         name: "",
         endpoint: "",
