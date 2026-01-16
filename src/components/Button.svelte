@@ -24,16 +24,17 @@
   </span>
 </button>
 
+<!--suppress CssUnusedSymbol -->
 <style>
   button {
     position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: var(--spacer-05);
     border-radius: 4px;
     border: 1px solid var(--border-color);
-    padding: 6px 12px;
+    padding: var(--spacer-075) var(--spacer-1);
     font-size: 13px;
     font-family: inherit;
     font-weight: 500;

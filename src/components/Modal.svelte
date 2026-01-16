@@ -62,14 +62,14 @@
   }
 
   .modal-content {
-    padding: 24px;
+    padding: var(--spacer-2);
   }
 
   .modal-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 16px;
+    margin-bottom: var(--spacer-1);
   }
 
   .modal-header h2 {
@@ -81,7 +81,7 @@
   .modal-header :global(.close-button) {
     color: var(--text-secondary);
     font-size: 20px;
-    padding: 4px 8px;
+    padding: var(--spacer-05);
     line-height: 1;
   }
 

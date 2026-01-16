@@ -15,21 +15,21 @@
 <style>
   .toast-container {
     position: fixed;
-    bottom: 16px;
+    bottom: var(--spacer-1);
     left: 50%;
     transform: translateX(-50%);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: var(--spacer-05);
     z-index: 1000;
   }
 
   .toast {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px 8px 12px 16px;
+    gap: var(--spacer-1);
+    padding: var(--spacer-075) 0 var(--spacer-075) var(--spacer-1);
     border-radius: 4px;
     min-width: 250px;
     max-width: 400px;
