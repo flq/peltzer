@@ -1,77 +1,72 @@
 <script lang="ts">
-  import type { StandardConnectionConfig } from "../lib/types";
+    import type {StandardConnectionConfig} from "../lib/types";
 
-  interface Props {
-    initial?: StandardConnectionConfig | null;
-    onchange: (config: StandardConnectionConfig) => void;
-  }
+    interface Props {
+        initial?: StandardConnectionConfig | null;
+        onchange: (config: StandardConnectionConfig) => void;
+    }
 
-  let { initial = null, onchange }: Props = $props();
+    let {initial = null, onchange}: Props = $props();
 
-  let name = $state(initial?.name ?? "");
-  let host = $state(initial?.host ?? "localhost");
-  let port = $state(initial?.port ?? 8182);
-  let username = $state(initial?.username ?? "");
-  let password = $state(initial?.password ?? "");
-  let useSsl = $state(initial?.use_ssl ?? false);
+    let localValues = $state($state.snapshot((() => initial)()) ?? {
+        type: "standard",
+        name: "",
+        host: "localhost",
+        port: 8182,
+        username: "",
+        password: "",
+        use_ssl: false,
+    } satisfies StandardConnectionConfig);
 
-  $effect(() => {
-    const config: StandardConnectionConfig = {
-      type: "standard",
-      name,
-      host,
-      port,
-      username: username || undefined,
-      password: password || undefined,
-      use_ssl: useSsl,
-    };
-    onchange(config);
-  });
+    $effect(() => {
+        onchange(localValues);
+    });
 </script>
 
 <label>
-  Name
-  <input type="text" bind:value={name} placeholder="My Database" required />
+    Name
+    <!-- svelte-ignore a11y_autofocus -->
+    <input type="text" bind:value={localValues.name} placeholder="My Database" required autofocus />
 </label>
 <label>
-  Host
-  <input type="text" bind:value={host} placeholder="localhost" required />
+    Host
+    <input type="text" bind:value={localValues.host} placeholder="localhost" required/>
 </label>
 <label>
-  Port
-  <input type="number" bind:value={port} required />
+    Port
+    <input type="number" bind:value={localValues.port} required/>
 </label>
 <label>
-  Username
-  <input type="text" bind:value={username} placeholder="(optional)" />
+    Username
+    <input type="text" bind:value={localValues.username} placeholder="(optional)"/>
 </label>
 <label>
-  Password
-  <input type="password" bind:value={password} placeholder="(optional)" />
+    Password
+    <input type="password" bind:value={localValues.password} placeholder="(optional)"/>
 </label>
 <label class="checkbox-label">
-  <input type="checkbox" bind:checked={useSsl} />
-  Use SSL/TLS
+    <input type="checkbox" bind:checked={localValues.use_ssl}/>
+    Use SSL/TLS
 </label>
 
 <style>
-  label {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacer-025);
-    color: var(--text-secondary);
-  }
+    label {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacer-025);
+        color: var(--text-secondary);
+    }
 
-  label.checkbox-label {
-    margin-top: var(--spacer-1);
-    flex-direction: row;
-    align-items: center;
-    gap: var(--spacer-05);
-  }
+    label.checkbox-label {
+        margin-top: var(--spacer-1);
+        flex-direction: row;
+        align-items: center;
+        gap: var(--spacer-05);
+    }
 
-  input[type="text"],
-  input[type="password"],
-  input[type="number"] {
-    width: 100%;
-  }
+    input[type="text"],
+    input[type="password"],
+    input[type="number"] {
+        width: 100%;
+    }
 </style>

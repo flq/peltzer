@@ -13,7 +13,7 @@ const defaultProps = {
   onDisconnect: vi.fn(),
 };
 
-const mockConnection = { name: "Test", host: "localhost", port: 8182, use_ssl: false };
+const mockConnection = { type: "standard" as const, name: "Test", host: "localhost", port: 8182, use_ssl: false };
 
 describe("ExecutionPanel", () => {
   beforeEach(() => {

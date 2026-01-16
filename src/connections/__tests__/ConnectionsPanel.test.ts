@@ -111,8 +111,8 @@ describe("ConnectionsPanel", () => {
     await waitFor(() => {
       expect(api.saveConnection).toHaveBeenCalledWith({
         ...mockStandardConnection,
-        username: undefined,
-        password: undefined,
+        username: "",
+        password: "",
       });
     });
   });

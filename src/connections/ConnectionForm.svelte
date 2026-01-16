@@ -82,19 +82,18 @@
             />
         {/if}
 
-
-    </form>
-    <div class="actions u-flex-column">
-        {#if testSuccess}
-            <div class="test-success">{testSuccess}</div>
-        {:else if testError}
-            <div class="test-error">{testError}</div>
-        {/if}
-        <div class="form-actions">
-            <TestConnectionButton config={currentConfig} onsuccess={handleTestSuccess} onerror={handleTestError}/>
-            <Button type="submit" pending={saving}>Save</Button>
+        <div class="actions u-flex-column">
+            {#if testSuccess}
+                <div class="test-success">{testSuccess}</div>
+            {:else if testError}
+                <div class="test-error">{testError}</div>
+            {/if}
+            <div class="form-actions">
+                <TestConnectionButton config={currentConfig} onsuccess={handleTestSuccess} onerror={handleTestError}/>
+                <Button type="submit" pending={saving}>Save</Button>
+            </div>
         </div>
-    </div>
+    </form>
 {/if}
 
 <style>
@@ -136,7 +135,7 @@
 
     .test-success,
     .test-error {
-        margin-top: var(--spacer-2);
+        margin-top: var(--spacer-15);
         padding: var(--spacer-075);
         background-color: var(--bg-tertiary);
         border-radius: var(--border-radius);

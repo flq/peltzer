@@ -4,7 +4,6 @@
 
 - [ ] Query history
 - [ ] Apply changes to window title
-- [ ] Ability to state what graphson version to use when deserializing results in the connection definition
 
 ## Done
 

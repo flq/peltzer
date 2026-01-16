@@ -12,10 +12,14 @@
   };
 
   let error = $state<string | null>(null);
+  let success = $state<string | null>(null);
 </script>
 
 <ToastContainer />
+{#if success}
+  <div class="test-success">{success}</div>
+{/if}
 {#if error}
   <div class="test-error">{error}</div>
 {/if}
-<TestConnectionButton {config} onerror={(e) => error = e} />
+<TestConnectionButton {config} onsuccess={(s) => success = s} onerror={(e) => error = e} />
