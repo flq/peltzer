@@ -91,38 +91,36 @@
     align-items: center;
     justify-content: center;
     height: 100vh;
-    padding: 24px;
   }
 
   .panel-container {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: var(--spacer-2);
     min-width: 400px;
-    max-width: 500px;
+    max-width: 80%;
   }
 
   h1 {
-    font-size: 24px;
+    font-size: var(--font-size-large);
     font-weight: 600;
     color: var(--text-primary);
-    margin-bottom: 8px;
   }
 
   .connection-list {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: var(--spacer-05);
   }
 
   .connection-item {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
+    gap: var(--spacer-075);
+    padding: var(--spacer-075) var(--spacer-1);
     background: var(--bg-secondary);
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: var(--border-radius);
   }
 
   .connection-item :global(.connection-name) {
@@ -153,13 +151,13 @@
 
   .connection-actions {
     display: flex;
-    gap: 8px;
+    gap: var(--spacer-05);
     flex-shrink: 0;
   }
 
   .no-connections {
     color: var(--text-secondary);
     text-align: center;
-    padding: 24px;
+    padding: var(--spacer-2);
   }
 </style>

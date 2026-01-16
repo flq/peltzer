@@ -29,57 +29,49 @@
   });
 </script>
 
-<div class="fields">
-  <label>
-    Name
-    <input type="text" bind:value={name} placeholder="My Database" required />
-  </label>
-  <label>
-    Host
-    <input type="text" bind:value={host} placeholder="localhost" required />
-  </label>
-  <label>
-    Port
-    <input type="number" bind:value={port} required />
-  </label>
-  <label>
-    Username
-    <input type="text" bind:value={username} placeholder="(optional)" />
-  </label>
-  <label>
-    Password
-    <input type="password" bind:value={password} placeholder="(optional)" />
-  </label>
-  <label class="checkbox-label">
-    <input type="checkbox" bind:checked={useSsl} />
-    Use SSL/TLS
-  </label>
-</div>
+<label>
+  Name
+  <input type="text" bind:value={name} placeholder="My Database" required />
+</label>
+<label>
+  Host
+  <input type="text" bind:value={host} placeholder="localhost" required />
+</label>
+<label>
+  Port
+  <input type="number" bind:value={port} required />
+</label>
+<label>
+  Username
+  <input type="text" bind:value={username} placeholder="(optional)" />
+</label>
+<label>
+  Password
+  <input type="password" bind:value={password} placeholder="(optional)" />
+</label>
+<label class="checkbox-label">
+  <input type="checkbox" bind:checked={useSsl} />
+  Use SSL/TLS
+</label>
 
 <style>
-  .fields {
+  label {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-  }
-
-  .fields label {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    font-size: 12px;
+    gap: var(--spacer-025);
     color: var(--text-secondary);
   }
 
-  .fields label.checkbox-label {
+  label.checkbox-label {
+    margin-top: var(--spacer-1);
     flex-direction: row;
     align-items: center;
-    gap: 8px;
+    gap: var(--spacer-05);
   }
 
-  .fields input[type="text"],
-  .fields input[type="password"],
-  .fields input[type="number"] {
+  input[type="text"],
+  input[type="password"],
+  input[type="number"] {
     width: 100%;
   }
 </style>

@@ -32,10 +32,9 @@
     align-items: center;
     justify-content: center;
     gap: var(--spacer-05);
-    border-radius: 4px;
+    border-radius: var(--border-radius);
     border: 1px solid var(--border-color);
     padding: var(--spacer-075) var(--spacer-1);
-    font-size: 13px;
     font-family: inherit;
     font-weight: 500;
     cursor: pointer;
@@ -99,7 +98,7 @@
   }
 
   .size-big {
-    font-size: 20px;
+    font-size: var(--font-size-large);
   }
 
   .content.hidden {

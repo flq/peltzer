@@ -49,7 +49,7 @@
   dialog {
     background: var(--bg-secondary);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: var(--border-radius);
     padding: 0;
     min-width: 500px;
     max-width: 90vw;
@@ -69,7 +69,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: var(--spacer-1);
+    margin-bottom: var(--spacer-2);
   }
 
   .modal-header h2 {

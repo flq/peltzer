@@ -30,18 +30,18 @@
     align-items: center;
     gap: var(--spacer-1);
     padding: var(--spacer-075) 0 var(--spacer-075) var(--spacer-1);
-    border-radius: 4px;
+    border-radius: var(--border-radius);
     min-width: 250px;
-    max-width: 400px;
+    max-width: 80%;
   }
 
   .toast-success {
-    background-color: #10b981;
+    background-color: var(--success-color);
     color: white;
   }
 
   .toast-error {
-    background-color: #ef4444;
+    background-color: var(--error-color);
     color: white;
   }
 

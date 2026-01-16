@@ -27,51 +27,42 @@
   });
 </script>
 
-<div class="fields">
-  <label>
-    Name
-    <input type="text" bind:value={name} placeholder="My Cosmos DB" required />
-  </label>
-  <label>
-    Endpoint
-    <input
-      type="text"
-      bind:value={endpoint}
-      placeholder="myaccount.gremlin.cosmos.azure.com"
-      required
-    />
-  </label>
-  <label>
-    Database
-    <input type="text" bind:value={database} placeholder="graphdb" required />
-  </label>
-  <label>
-    Container
-    <input type="text" bind:value={container} placeholder="mygraph" required />
-  </label>
-  <label>
-    Key
-    <input type="password" bind:value={key} placeholder="Primary key" required />
-  </label>
-</div>
+<label>
+  Name
+  <input type="text" bind:value={name} placeholder="My Cosmos DB" required />
+</label>
+<label>
+  Endpoint
+  <input
+    type="text"
+    bind:value={endpoint}
+    placeholder="myaccount.gremlin.cosmos.azure.com"
+    required
+  />
+</label>
+<label>
+  Database
+  <input type="text" bind:value={database} placeholder="graphdb" required />
+</label>
+<label>
+  Container
+  <input type="text" bind:value={container} placeholder="mygraph" required />
+</label>
+<label>
+  Key
+  <input type="password" bind:value={key} placeholder="Primary key" required />
+</label>
 
 <style>
-  .fields {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .fields label {
+  label {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    font-size: 12px;
     color: var(--text-secondary);
   }
 
-  .fields input[type="text"],
-  .fields input[type="password"] {
+  input[type="text"],
+  input[type="password"] {
     width: 100%;
   }
 </style>
