@@ -8,11 +8,11 @@
     import CosmosConnectionFields from "./CosmosConnectionFields.svelte";
 
     interface Props {
-        editConfig?: ConnectionConfig | null;
-        onsave?: () => void;
+        defaultConfig?: ConnectionConfig | null;
+        onSave?: () => void;
     }
 
-    let {editConfig = null, onsave}: Props = $props();
+    let {defaultConfig = null, onSave}: Props = $props();
 
     let saving = $state(false);
     let selectedType = $state<"standard" | "cosmos" | null>(null);
@@ -22,7 +22,7 @@
 
     // Update selectedType when editConfig changes (e.g., when opening edit modal)
     $effect(() => {
-        selectedType = editConfig?.type ?? null;
+        selectedType = defaultConfig?.type ?? null;
     });
 
     function selectType(type: "standard" | "cosmos") {
@@ -53,7 +53,7 @@
             await saveConnection(currentConfig);
             const connections = await getSavedConnections();
             savedConnections.set(connections);
-            onsave?.();
+            onSave?.();
         } finally {
             saving = false;
         }
@@ -72,12 +72,12 @@
     <form class="connection-form u-flex-column" onsubmit={(e) => { e.preventDefault(); handleSave(); }}>
         {#if selectedType === "standard"}
             <StandardConnectionFields
-                    initial={editConfig?.type === "standard" ? editConfig : null}
+                    initial={defaultConfig?.type === "standard" ? defaultConfig : null}
                     onchange={handleConfigChange}
             />
         {:else if selectedType === "cosmos"}
             <CosmosConnectionFields
-                    initial={editConfig?.type === "cosmos" ? editConfig : null}
+                    initial={defaultConfig?.type === "cosmos" ? defaultConfig : null}
                     onchange={handleConfigChange}
             />
         {/if}
