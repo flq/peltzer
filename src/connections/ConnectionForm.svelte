@@ -18,6 +18,7 @@
     let selectedType = $state<"standard" | "cosmos" | null>(null);
     let currentConfig = $state<ConnectionConfig | null>(null);
     let testError = $state<string | null>(null);
+    let testSuccess = $state<string | null>(null);
 
     // Update selectedType when editConfig changes (e.g., when opening edit modal)
     $effect(() => {
@@ -31,10 +32,17 @@
     function handleConfigChange(config: ConnectionConfig) {
         currentConfig = config;
         testError = null;
+        testSuccess = null;
+    }
+
+    function handleTestSuccess(message: string) {
+        testSuccess = message;
+        testError = null;
     }
 
     function handleTestError(error: string | null) {
         testError = error;
+        testSuccess = null;
     }
 
     async function handleSave() {
@@ -77,11 +85,13 @@
 
     </form>
     <div class="actions u-flex-column">
-        {#if testError}
+        {#if testSuccess}
+            <div class="test-success">{testSuccess}</div>
+        {:else if testError}
             <div class="test-error">{testError}</div>
         {/if}
         <div class="form-actions">
-            <TestConnectionButton config={currentConfig} onerror={handleTestError}/>
+            <TestConnectionButton config={currentConfig} onsuccess={handleTestSuccess} onerror={handleTestError}/>
             <Button type="submit" pending={saving}>Save</Button>
         </div>
     </div>
@@ -124,12 +134,21 @@
         flex: 1;
     }
 
+    .test-success,
     .test-error {
         margin-top: var(--spacer-2);
         padding: var(--spacer-075);
         background-color: var(--bg-tertiary);
-        border: 1px solid var(--warning-color);
         border-radius: var(--border-radius);
+    }
+
+    .test-success {
+        border: 1px solid var(--success-color);
+        color: var(--success-color);
+    }
+
+    .test-error {
+        border: 1px solid var(--warning-color);
         color: var(--warning-color);
     }
 </style>

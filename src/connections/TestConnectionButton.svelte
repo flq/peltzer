@@ -1,15 +1,15 @@
 <script lang="ts">
   import { testConnection } from "../lib/api";
-  import { toast } from "../lib/toastStore";
   import type { ConnectionConfig } from "../lib/types";
   import Button from "../components/Button.svelte";
 
   interface Props {
     config: ConnectionConfig | null;
+    onsuccess?: (message: string) => void;
     onerror?: (error: string | null) => void;
   }
 
-  let { config, onerror }: Props = $props();
+  let { config, onsuccess, onerror }: Props = $props();
   let testing = $state(false);
 
   async function handleTest() {
@@ -18,7 +18,7 @@
     onerror?.(null);
     try {
       const result = await testConnection(config);
-      toast(result, "success");
+      onsuccess?.(result);
     } catch (e) {
       onerror?.(`${e}`);
     } finally {

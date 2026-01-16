@@ -1,6 +1,7 @@
 <script lang="ts">
   export let results = "";
   export let resultCount = "";
+  export let loading = false;
 </script>
 
 <div class="results-section u-flex-column">
@@ -8,7 +9,7 @@
     <h3>Results</h3>
     <span class="result-count">{resultCount}</span>
   </div>
-  <pre class="results-output">{results}</pre>
+  <pre class="results-output" class:loading>{results}</pre>
 </div>
 
 <style>
@@ -44,5 +45,10 @@
     overflow: auto;
     white-space: pre-wrap;
     word-break: break-word;
+    transition: opacity 0.15s ease-in-out;
+  }
+
+  .results-output.loading {
+    opacity: 0.5;
   }
 </style>

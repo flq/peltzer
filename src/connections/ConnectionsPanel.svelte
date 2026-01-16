@@ -106,7 +106,7 @@
   }
 
   .connection-list {
-    gap: var(--spacer-05);
+    gap: var(--spacer-075);
   }
 
   .connection-item {

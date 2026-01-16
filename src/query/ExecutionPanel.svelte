@@ -18,8 +18,6 @@
     if (!query || !$isConnected) return;
 
     isExecuting = true;
-    results = "Executing...";
-    resultCount = "";
 
     try {
       const result = await executeQuery(query);
@@ -49,7 +47,7 @@
     onexecute={handleExecute}
     {onDisconnect}
   />
-  <ResultsPane {results} {resultCount} />
+  <ResultsPane {results} {resultCount} loading={isExecuting} />
 </div>
 
 <style>
