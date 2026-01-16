@@ -82,7 +82,9 @@
 </div>
 
 <Modal open={showModal} title={editingConnection ? "Edit Connection" : "New Connection"} onclose={handleModalClose}>
-  <ConnectionForm editConfig={editingConnection} onsave={handleSave} />
+  {#key showModal}
+    <ConnectionForm editConfig={editingConnection} onsave={handleSave} />
+  {/key}
 </Modal>
 
 <style>

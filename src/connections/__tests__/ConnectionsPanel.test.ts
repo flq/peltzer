@@ -203,4 +203,33 @@ describe("ConnectionsPanel", () => {
     expect(screen.getByDisplayValue(mockCosmosConnection.name)).toBeInTheDocument();
     expect(screen.getByDisplayValue(mockCosmosConnection.endpoint)).toBeInTheDocument();
   });
+
+  it("resets form state when closing and reopening modal", async () => {
+    const onconnect = vi.fn();
+    render(ConnectionsPanel, { props: { onconnect } });
+
+    // Open modal
+    const addButton = screen.getByRole("button", { name: /new connection/i });
+    await fireEvent.click(addButton);
+
+    // Select Standard type
+    const standardButton = screen.getByRole("button", { name: "Standard" });
+    await fireEvent.click(standardButton);
+
+    // Verify we're in the Standard form (no type selector)
+    expect(screen.queryByText("Select connection type:")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Host")).toBeInTheDocument();
+
+    // Close modal via close button
+    const closeButton = screen.getByRole("button", { name: "×" });
+    await fireEvent.click(closeButton);
+
+    // Reopen modal
+    await fireEvent.click(addButton);
+
+    // Should show type selector again, not the Standard form
+    expect(screen.getByText("Select connection type:")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Standard" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Cosmos DB" })).toBeInTheDocument();
+  });
 });
