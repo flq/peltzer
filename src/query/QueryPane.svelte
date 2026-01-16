@@ -27,7 +27,7 @@
   }
 </script>
 
-<div class="query-section">
+<div class="query-section u-flex-column">
   <div class="query-header">
     <h3>Query</h3>
     <div class="query-actions">
@@ -53,8 +53,6 @@
 
 <style>
   .query-section {
-    display: flex;
-    flex-direction: column;
     flex-shrink: 0;
     border-bottom: 1px solid var(--border-color);
   }

@@ -53,7 +53,7 @@
 </script>
 
 {#if selectedType === null}
-    <div class="type-selector">
+    <div class="type-selector u-flex-column">
         <p class="type-prompt">Select connection type:</p>
         <div class="type-buttons">
             <Button kind="secondary" onclick={() => selectType("standard")}>Standard</Button>
@@ -61,7 +61,7 @@
         </div>
     </div>
 {:else}
-    <form class="connection-form" onsubmit={(e) => { e.preventDefault(); handleSave(); }}>
+    <form class="connection-form u-flex-column" onsubmit={(e) => { e.preventDefault(); handleSave(); }}>
         {#if selectedType === "standard"}
             <StandardConnectionFields
                     initial={editConfig?.type === "standard" ? editConfig : null}
@@ -76,7 +76,7 @@
 
 
     </form>
-    <div class="actions">
+    <div class="actions u-flex-column">
         {#if testError}
             <div class="test-error">{testError}</div>
         {/if}
@@ -89,8 +89,6 @@
 
 <style>
     .type-selector {
-        display: flex;
-        flex-direction: column;
         gap: var(--spacer-075);
     }
 
@@ -109,15 +107,11 @@
     }
 
     .connection-form {
-        display: flex;
-        flex-direction: column;
         gap: var(--spacer-1);
     }
 
     .actions {
-        display: flex;
         gap: var(--spacer-05);
-        flex-direction: column;
     }
 
     .form-actions {

@@ -3,7 +3,7 @@
   export let resultCount = "";
 </script>
 
-<div class="results-section">
+<div class="results-section u-flex-column">
   <div class="results-header">
     <h3>Results</h3>
     <span class="result-count">{resultCount}</span>
@@ -14,8 +14,6 @@
 <style>
   .results-section {
     flex: 1;
-    display: flex;
-    flex-direction: column;
     overflow: hidden;
   }
 

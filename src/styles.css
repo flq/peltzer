@@ -83,3 +83,9 @@ input:focus {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-secondary);
 }
+
+/* Utilities */
+.u-flex-column {
+  display: flex;
+  flex-direction: column;
+}

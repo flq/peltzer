@@ -3,7 +3,7 @@
   import Button from "./Button.svelte";
 </script>
 
-<div class="toast-container">
+<div class="toast-container u-flex-column">
   {#each $toasts as toast (toast.id)}
     <div class="toast toast-{toast.type}">
       <span class="toast-message">{toast.message}</span>
@@ -18,8 +18,6 @@
     bottom: var(--spacer-1);
     left: 50%;
     transform: translateX(-50%);
-    display: flex;
-    flex-direction: column;
     align-items: center;
     gap: var(--spacer-05);
     z-index: 1000;

@@ -42,7 +42,7 @@
   }
 </script>
 
-<div class="execution-panel">
+<div class="execution-panel u-flex-column">
   <QueryPane
     disabled={!$isConnected}
     {isExecuting}
@@ -55,8 +55,6 @@
 <style>
   .execution-panel {
     height: 100%;
-    display: flex;
-    flex-direction: column;
     overflow: hidden;
   }
 </style>

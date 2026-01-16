@@ -49,11 +49,11 @@
 </script>
 
 <div class="connections-panel">
-  <div class="panel-container">
+  <div class="panel-container u-flex-column">
     <h1>Connections</h1>
 
     {#if $savedConnections.length > 0}
-      <div class="connection-list">
+      <div class="connection-list u-flex-column">
         {#each $savedConnections as conn (conn.name)}
           <div class="connection-item">
             <Button kind="bare" class="connection-name" onclick={() => onconnect(conn)}>
@@ -94,8 +94,6 @@
   }
 
   .panel-container {
-    display: flex;
-    flex-direction: column;
     gap: var(--spacer-2);
     min-width: 400px;
     max-width: 80%;
@@ -108,8 +106,6 @@
   }
 
   .connection-list {
-    display: flex;
-    flex-direction: column;
     gap: var(--spacer-05);
   }
 
