@@ -25,13 +25,6 @@ pub enum ConnectionConfig {
 }
 
 impl ConnectionConfig {
-    pub fn name(&self) -> &str {
-        match self {
-            ConnectionConfig::Standard { name, .. } => name,
-            ConnectionConfig::Cosmos { name, .. } => name,
-        }
-    }
-
     pub fn display_info(&self) -> String {
         match self {
             ConnectionConfig::Standard { host, port, .. } => format!("{}:{}", host, port),

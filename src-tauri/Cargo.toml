@@ -26,7 +26,7 @@ serde_json = "1"
 # For local development:
 gremlin-client = { path = "../../gremlin-rs/gremlin-client", features = ["tokio-runtime"] }
 # For releases:
-# gremlin-client = { git = "https://github.com/flq/gremlin-rs", branch = "cosmos-support", features = ["tokio-runtime"] }
+# gremlin-client = { git = "https://github.com/flq/gremlin-rs", branch = "peltzer-support", features = ["tokio-runtime"] }
 tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
 futures = "0.3"
 
