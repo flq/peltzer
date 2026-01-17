@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-  import { savedConnections } from "../lib/stores";
-  import { getSavedConnections, deleteConnection } from "../lib/api";
-  import type { ConnectionConfig } from "../lib/types";
+  import {onMount} from "svelte";
+  import {savedConnections} from "../lib/stores";
+  import {getSavedConnections, deleteConnection, saveConnection} from "../lib/api";
+  import {ConnectionConfig, getName} from "../lib/types";
   import Button from "../components/Button.svelte";
   import Modal from "../components/Modal.svelte";
   import ConnectionForm from "./ConnectionForm.svelte";
@@ -11,7 +11,7 @@
     onconnect: (config: ConnectionConfig) => void;
   }
 
-  let { onconnect }: Props = $props();
+  let {onconnect}: Props = $props();
 
   let showModal = $state(false);
   let editingConnection = $state<ConnectionConfig | null>(null);
@@ -21,30 +21,28 @@
     savedConnections.set(connections);
   });
 
-  function handleAddNew() {
+  async function handleSave(connection: ConnectionConfig) {
+    await saveConnection(connection);
+    const connections = await getSavedConnections();
+    savedConnections.set(connections);
+    showModal = false;
     editingConnection = null;
-    showModal = true;
   }
 
-  function handleEdit(config: ConnectionConfig) {
+  async function handleDelete(config: ConnectionConfig) {
+    await deleteConnection(config.name);
+    const connections = await getSavedConnections();
+    savedConnections.set(connections);
+  }
+
+  function handleEdit(config: ConnectionConfig | null) {
     editingConnection = config;
     showModal = true;
   }
 
   function handleModalClose() {
-    showModal = false;
     editingConnection = null;
-  }
-
-  function handleSave() {
     showModal = false;
-    editingConnection = null;
-  }
-
-  async function handleDelete(name: string) {
-    await deleteConnection(name);
-    const connections = await getSavedConnections();
-    savedConnections.set(connections);
   }
 </script>
 
@@ -59,16 +57,12 @@
             <Button kind="bare" class="connection-name" onclick={() => onconnect(conn)}>
               {conn.name}
               <span class="connection-host">
-                {#if conn.type === "cosmos"}
-                  {conn.endpoint}/{conn.database}
-                {:else}
-                  {conn.host}:{conn.port}
-                {/if}
+                {getName(conn)}
               </span>
             </Button>
             <div class="connection-actions">
               <Button kind="secondary" onclick={() => handleEdit(conn)}>Edit</Button>
-              <Button kind="secondary" onclick={() => handleDelete(conn.name)}>Delete</Button>
+              <Button kind="secondary" onclick={() => handleDelete(conn)}>Delete</Button>
             </div>
           </div>
         {/each}
@@ -77,13 +71,13 @@
       <p class="no-connections">No saved connections</p>
     {/if}
 
-    <Button onclick={handleAddNew}>+ New Connection...</Button>
+    <Button onclick={() => handleEdit(null)}>+ New Connection...</Button>
   </div>
 </div>
 
 <Modal open={showModal} title={editingConnection ? "Edit Connection" : "New Connection"} onclose={handleModalClose}>
   {#key showModal}
-    <ConnectionForm defaultConfig={editingConnection} onSave={handleSave} />
+    <ConnectionForm defaultConfig={editingConnection} onSave={handleSave}/>
   {/key}
 </Modal>
 

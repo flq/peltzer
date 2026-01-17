@@ -1,6 +1,4 @@
 <script lang="ts">
-    import {savedConnections} from "../lib/stores";
-    import {saveConnection, getSavedConnections} from "../lib/api";
     import type {ConnectionConfig} from "../lib/types";
     import Button from "../components/Button.svelte";
     import TestConnectionButton from "./TestConnectionButton.svelte";
@@ -9,7 +7,7 @@
 
     interface Props {
         defaultConfig?: ConnectionConfig | null;
-        onSave?: () => void;
+        onSave?: (connectionConfig: ConnectionConfig) => Promise<void>;
     }
 
     let {defaultConfig = null, onSave}: Props = $props();
@@ -47,13 +45,9 @@
 
     async function handleSave() {
         if (!currentConfig) return;
-
         saving = true;
         try {
-            await saveConnection(currentConfig);
-            const connections = await getSavedConnections();
-            savedConnections.set(connections);
-            onSave?.();
+            onSave?.(currentConfig);
         } finally {
             saving = false;
         }

@@ -18,3 +18,12 @@ export interface CosmosConnectionConfig {
 }
 
 export type ConnectionConfig = StandardConnectionConfig | CosmosConnectionConfig;
+
+export function getName(connection: ConnectionConfig): string {
+  switch (connection.type) {
+    case "standard":
+      return `${connection.host}:${connection.port}`;
+    case "cosmos":
+      return `${connection.endpoint}/${connection.database}`;
+  }
+}
