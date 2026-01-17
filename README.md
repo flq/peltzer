@@ -1,6 +1,10 @@
+
+<img alt="Peltzer icon" src="src-tauri/icons/128x128.png" width="128" style="display: block; margin: 0 auto">
+
 # Peltzer
 
-Randall Peltzer was the dude that found Mogwai, who was then father to many gremlins. Goddit?
+Randall Peltzer was the dude that found Mogwai, 
+who was then father to many gremlins. See what I did there?
 
 ## Prerequisites
 
