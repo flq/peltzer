@@ -1,7 +1,11 @@
 <script lang="ts">
-  export let results = "";
-  export let resultCount = "";
-  export let loading = false;
+  interface Props {
+    results?: string;
+    resultCount?: string;
+    loading?: boolean;
+  }
+
+  let { results = "", resultCount = "", loading = false }: Props = $props();
 </script>
 
 <div class="results-section u-flex-column">

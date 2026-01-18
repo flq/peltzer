@@ -2,7 +2,8 @@
   import {onMount} from "svelte";
   import {savedConnections} from "../lib/stores";
   import {getSavedConnections, deleteConnection, saveConnection} from "../lib/api";
-  import {ConnectionConfig, getName} from "../lib/types";
+  import {getName} from "../lib/types";
+  import type {ConnectionConfig} from "../lib/types";
   import Button from "../components/Button.svelte";
   import Modal from "../components/Modal.svelte";
   import ConnectionForm from "./ConnectionForm.svelte";

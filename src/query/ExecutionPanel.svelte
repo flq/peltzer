@@ -1,8 +1,33 @@
+<!--
+  ExecutionPanel - Top-level component for query execution UI
+
+  Component Hierarchy:
+  ────────────────────
+  ExecutionPanel
+  ├── QueryHeader (buttons: Execute, New Tab, Disconnect)
+  └── TabContainer (tab management)
+      ├── TabBar (tab headers, visible when 2+ tabs)
+      └── QueryTab (textarea + results)
+          └── ResultsPane (results display)
+
+  queryStore Access:
+  ──────────────────
+  ExecutionPanel (this component)
+    - reads:  activeTabId, activeQuery, tabResults[].isExecuting
+    - writes: setExecuting(), setResult()
+
+  TabContainer
+    - writes: setActiveTab(), updateActiveQuery(), clearTab(), reset()
+
+  QueryTab
+    - reads:  tabResults[tabId] (results, resultCount, isExecuting)
+-->
 <script lang="ts">
-  import QueryPane from "./QueryPane.svelte";
-  import ResultsPane from "./ResultsPane.svelte";
-  import { executeQuery } from "../lib/api";
+  import QueryHeader from "./QueryHeader.svelte";
+  import TabContainer, { type TabContainerState } from "./TabContainer.svelte";
   import { isConnected } from "../lib/stores";
+  import { executeQuery } from "../lib/api";
+  import { queryStore } from "./queryStore";
 
   interface Props {
     onDisconnect: () => void;
@@ -10,44 +35,88 @@
 
   let { onDisconnect }: Props = $props();
 
-  let isExecuting = $state(false);
-  let results = $state("");
-  let resultCount = $state("");
+  let tabContainer: TabContainer;
+  let containerState = $state<TabContainerState>({ canAddTab: true });
 
-  async function handleExecute(query: string) {
-    if (!query || !$isConnected) return;
+  function handleStateChange(state: TabContainerState) {
+    containerState = state;
+  }
 
-    isExecuting = true;
+  let isExecuting = $derived(
+    $queryStore.activeTabId
+      ? ($queryStore.tabResults.get($queryStore.activeTabId)?.isExecuting ?? false)
+      : false
+  );
 
-    try {
-      const result = await executeQuery(query);
-      results = result;
+  function handleExecute() {
+    if (!$isConnected) return;
+    if (!$queryStore.activeTabId || !$queryStore.activeQuery.trim()) return;
 
-      try {
-        const parsed = JSON.parse(result);
-        if (Array.isArray(parsed)) {
-          resultCount = `${parsed.length} result(s)`;
+    const tabId = $queryStore.activeTabId;
+    const query = $queryStore.activeQuery.trim();
+
+    queryStore.setExecuting(tabId);
+
+    // Execute and write results back to store
+    executeQuery(query)
+      .then((result) => {
+        let resultCount = "";
+        try {
+          const parsed = JSON.parse(result);
+          if (Array.isArray(parsed)) {
+            resultCount = `${parsed.length} result(s)`;
+          }
+        } catch {
+          // non-JSON result, no count
         }
-      } catch {
-        // Not JSON, that's fine
+        queryStore.setResult(tabId, result, resultCount);
+      })
+      .catch((e) => {
+        queryStore.setResult(tabId, `Error: ${e}`, "");
+      });
+  }
+
+  function handleAddTab() {
+    tabContainer.addTab();
+  }
+
+  function handleDisconnect() {
+    tabContainer.reset();
+    onDisconnect();
+  }
+
+  function handleKeydown(e: KeyboardEvent) {
+    if (e.ctrlKey || e.metaKey) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        handleExecute();
+      } else if (e.key === "t") {
+        e.preventDefault();
+        handleAddTab();
+      } else if (e.key === "Tab") {
+        e.preventDefault();
+        if (e.shiftKey) {
+          tabContainer.prevTab();
+        } else {
+          tabContainer.nextTab();
+        }
       }
-    } catch (e) {
-      results = `Error: ${e}`;
-      resultCount = "";
-    } finally {
-      isExecuting = false;
     }
   }
 </script>
 
+<svelte:window onkeydown={handleKeydown} />
+
 <div class="execution-panel u-flex-column">
-  <QueryPane
+  <QueryHeader
     disabled={!$isConnected}
     {isExecuting}
-    onexecute={handleExecute}
-    {onDisconnect}
+    canAddTab={containerState.canAddTab}
+    onExecute={handleExecute}
+    onAddTab={handleAddTab}
+    onDisconnect={handleDisconnect}
   />
-  <ResultsPane {results} {resultCount} loading={isExecuting} />
+  <TabContainer bind:this={tabContainer} onStateChange={handleStateChange} />
 </div>
 
 <style>
