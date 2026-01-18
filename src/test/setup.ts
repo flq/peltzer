@@ -24,3 +24,11 @@ vi.mock("@tauri-apps/plugin-store", () => ({
     }),
   },
 }));
+
+// Mock @tauri-apps/api/window
+export const mockSetTitle = vi.fn().mockResolvedValue(undefined);
+vi.mock("@tauri-apps/api/window", () => ({
+  getCurrentWindow: vi.fn(() => ({
+    setTitle: mockSetTitle,
+  })),
+}));
