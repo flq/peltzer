@@ -21,6 +21,19 @@ const mockConnection = {
   use_ssl: false,
 };
 
+async function tryClickConnect() {
+  vi.mocked(api.getSavedConnections).mockResolvedValue([mockConnection]);
+
+  render(App);
+
+  await waitFor(() => {
+    expect(screen.getByText("Test DB")).toBeInTheDocument();
+  });
+
+  const connectionButton = screen.getByRole("button", {name: /test db/i});
+  await fireEvent.click(connectionButton);
+}
+
 describe("App", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -29,17 +42,8 @@ describe("App", () => {
 
   it("sets window title with connection name after successful connect", async () => {
     vi.mocked(api.connect).mockResolvedValue("connected");
-    vi.mocked(api.getSavedConnections).mockResolvedValue([mockConnection]);
 
-    render(App);
-
-    // Wait for connections to load and click on the connection
-    await waitFor(() => {
-      expect(screen.getByText("Test DB")).toBeInTheDocument();
-    });
-
-    const connectionButton = screen.getByRole("button", { name: /test db/i });
-    await fireEvent.click(connectionButton);
+    await tryClickConnect();
 
     await waitFor(() => {
       expect(mockSetTitle).toHaveBeenCalledWith("Peltzer - connected to «Test DB»");
@@ -48,18 +52,9 @@ describe("App", () => {
 
   it("resets window title to 'Peltzer' after successful disconnect", async () => {
     vi.mocked(api.connect).mockResolvedValue("connected");
-    vi.mocked(api.disconnect).mockResolvedValue(undefined);
-    vi.mocked(api.getSavedConnections).mockResolvedValue([mockConnection]);
+    vi.mocked(api.disconnect).mockResolvedValue("");
 
-    render(App);
-
-    // Connect first
-    await waitFor(() => {
-      expect(screen.getByText("Test DB")).toBeInTheDocument();
-    });
-
-    const connectionButton = screen.getByRole("button", { name: /test db/i });
-    await fireEvent.click(connectionButton);
+    await tryClickConnect();
 
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /disconnect/i })).toBeInTheDocument();
@@ -79,16 +74,8 @@ describe("App", () => {
 
   it("does not set window title if connect fails", async () => {
     vi.mocked(api.connect).mockRejectedValue(new Error("Connection refused"));
-    vi.mocked(api.getSavedConnections).mockResolvedValue([mockConnection]);
 
-    render(App);
-
-    await waitFor(() => {
-      expect(screen.getByText("Test DB")).toBeInTheDocument();
-    });
-
-    const connectionButton = screen.getByRole("button", { name: /test db/i });
-    await fireEvent.click(connectionButton);
+    await tryClickConnect();
 
     // Wait a bit for any async operations
     await waitFor(() => {
