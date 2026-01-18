@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Tab } from "./types";
   import Button from "../components/Button.svelte";
+  import { X } from "lucide-svelte";
 
   interface Props {
     tabs: Tab[];
@@ -18,8 +19,8 @@
       <button class="tab-label" onclick={() => onSelectTab(tab.id)}>
         Query {index + 1}
       </button>
-      <Button kind="bare" size="small" class="tab-close" onclick={() => onCloseTab(tab.id)}>
-        &times;
+      <Button kind="bare" size="small" class="tab-close" onclick={() => onCloseTab(tab.id)} title="Close tab">
+        <X class="icon-sm" />
       </Button>
     </div>
   {/each}
@@ -29,9 +30,8 @@
   .tab-bar {
     display: flex;
     gap: 2px;
-    padding: var(--spacer-05) var(--spacer-1);
+    padding: var(--spacer-05) var(--spacer-1) 1px var(--spacer-05);
     background-color: var(--bg-secondary);
-    border-bottom: 1px solid var(--border-color);
   }
 
   .tab {
@@ -41,7 +41,7 @@
     padding: var(--spacer-025) var(--spacer-05);
     background-color: var(--bg-primary);
     border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
   }
 
   .tab.active {

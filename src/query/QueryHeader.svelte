@@ -1,5 +1,6 @@
 <script lang="ts">
   import Button from "../components/Button.svelte";
+  import { Play, FilePlusCorner, Unplug } from "lucide-svelte";
 
   interface Props {
     disabled?: boolean;
@@ -23,16 +24,16 @@
 <div class="query-header">
   <h3>Query</h3>
   <div class="query-actions">
-    <Button onclick={onExecute} disabled={disabled || isExecuting} pending={isExecuting}>
-      Execute (Ctrl+Enter)
+    <Button onclick={onExecute} disabled={disabled || isExecuting} pending={isExecuting} title="Execute (Ctrl+Enter)">
+      <Play class="icon-md" />
     </Button>
     {#if canAddTab}
-      <Button kind="secondary" onclick={onAddTab}>
-        New Tab
+      <Button kind="secondary" onclick={onAddTab} title="New Tab (Ctrl+T)">
+        <FilePlusCorner class="icon-md" />
       </Button>
     {/if}
-    <Button kind="secondary" onclick={onDisconnect}>
-      Disconnect
+    <Button kind="secondary" onclick={onDisconnect} title="Disconnect">
+      <Unplug class="icon-md" />
     </Button>
   </div>
 </div>

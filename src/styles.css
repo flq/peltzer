@@ -20,6 +20,9 @@
   --font-size-normal: 14px;
   --font-size-large: calc(var(--font-size-normal) * 1.75);
 
+  --icon-size-sm: 12px;
+  --icon-size-md: 16px;
+
   --border-radius: 6px;
 
   --spacer-025: 0.25rem;
@@ -89,4 +92,17 @@ input:focus {
 .u-flex-column {
   display: flex;
   flex-direction: column;
+}
+
+/* Icon sizes */
+.icon-sm {
+  display: inline;
+  width: var(--icon-size-sm);
+  height: var(--icon-size-sm);
+}
+
+.icon-md {
+  display: inline;
+  width: var(--icon-size-md);
+  height: var(--icon-size-md);
 }

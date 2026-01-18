@@ -101,6 +101,12 @@
     font-size: var(--font-size-large);
   }
 
+  .content:has(:global(svg)) {
+    display: flex;
+    align-items: center;
+    gap: var(--spacer-05);
+  }
+
   .content.hidden {
     visibility: hidden;
   }

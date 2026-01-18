@@ -77,7 +77,7 @@ describe("ConnectionsPanel", () => {
     const addButton = screen.getByRole("button", { name: /new connection/i });
     await fireEvent.click(addButton);
 
-    expect(screen.getByText("New Connection")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "New Connection" })).toBeInTheDocument();
     // New connection shows type selector first
     expect(screen.getByText("Select connection type:")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Standard" })).toBeInTheDocument();

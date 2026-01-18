@@ -7,6 +7,7 @@
   import Button from "../components/Button.svelte";
   import Modal from "../components/Modal.svelte";
   import ConnectionForm from "./ConnectionForm.svelte";
+  import {PackagePlus} from "lucide-svelte";
 
   interface Props {
     onconnect: (config: ConnectionConfig) => void;
@@ -72,7 +73,9 @@
       <p class="no-connections">No saved connections</p>
     {/if}
 
-    <Button onclick={() => handleEdit(null)}>+ New Connection...</Button>
+    <Button onclick={() => handleEdit(null)}>
+      <PackagePlus class="icon-md" /> New Connection
+    </Button>
   </div>
 </div>
 

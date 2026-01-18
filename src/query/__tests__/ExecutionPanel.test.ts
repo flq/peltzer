@@ -239,8 +239,8 @@ describe("ExecutionPanel", () => {
       expect(screen.getByText("Query 1")).toBeInTheDocument();
       expect(screen.getByText("Query 2")).toBeInTheDocument();
 
-      // Close second tab (× button)
-      const closeButtons = screen.getAllByRole("button", { name: "×" });
+      // Close second tab (close button)
+      const closeButtons = document.querySelectorAll(".tab-close");
       await fireEvent.click(closeButtons[1]); // Close Query 2
 
       // Tab bar should be hidden (only one tab left)
