@@ -1,5 +1,7 @@
 <script lang="ts">
+    import {onMount} from "svelte";
     import type {ConnectionConfig} from "../lib/types";
+    import {isBiometryAvailable} from "../lib/biometry";
     import Button from "../components/Button.svelte";
     import TestConnectionButton from "./TestConnectionButton.svelte";
     import StandardConnectionFields from "./StandardConnectionFields.svelte";
@@ -17,6 +19,11 @@
     let currentConfig = $state<ConnectionConfig | null>(null);
     let testError = $state<string | null>(null);
     let testSuccess = $state<string | null>(null);
+    let biometryAvailable = $state(false);
+
+    onMount(async () => {
+        biometryAvailable = await isBiometryAvailable();
+    });
 
     // Update selectedType when editConfig changes (e.g., when opening edit modal)
     $effect(() => {
@@ -67,11 +74,13 @@
         {#if selectedType === "standard"}
             <StandardConnectionFields
                     initial={defaultConfig?.type === "standard" ? defaultConfig : null}
+                    {biometryAvailable}
                     onchange={handleConfigChange}
             />
         {:else if selectedType === "cosmos"}
             <CosmosConnectionFields
                     initial={defaultConfig?.type === "cosmos" ? defaultConfig : null}
+                    {biometryAvailable}
                     onchange={handleConfigChange}
             />
         {/if}

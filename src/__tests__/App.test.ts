@@ -11,6 +11,7 @@ vi.mock("../lib/api", () => ({
   getSavedConnections: vi.fn().mockResolvedValue([]),
   saveConnection: vi.fn(),
   deleteConnection: vi.fn(),
+  getConnectionWithCredentials: vi.fn().mockImplementation(async (config) => config),
 }));
 
 const mockConnection = {

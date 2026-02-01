@@ -14,6 +14,8 @@ pub enum ConnectionConfig {
         password: Option<String>,
         #[serde(default)]
         use_ssl: bool,
+        #[serde(default)]
+        secure_storage: bool,
     },
     Cosmos {
         name: String,
@@ -21,6 +23,8 @@ pub enum ConnectionConfig {
         database: String,
         container: String,
         key: String,
+        #[serde(default)]
+        secure_storage: bool,
     },
 }
 
@@ -97,6 +101,7 @@ mod tests {
             username: None,
             password: None,
             use_ssl: false,
+            secure_storage: false,
         };
 
         let opts = config.to_connection_options().unwrap();
@@ -112,6 +117,7 @@ mod tests {
             username: None,
             password: None,
             use_ssl: true,
+            secure_storage: false,
         };
 
         let opts = config.to_connection_options().unwrap();
@@ -126,6 +132,7 @@ mod tests {
             database: "mydb".to_string(),
             container: "mygraph".to_string(),
             key: "secret-key".to_string(),
+            secure_storage: false,
         };
 
         let opts = config.to_connection_options().unwrap();
@@ -145,6 +152,7 @@ mod tests {
             username: None,
             password: None,
             use_ssl: false,
+            secure_storage: false,
         };
 
         assert_eq!(config.display_info(), "localhost:8182");
@@ -158,11 +166,36 @@ mod tests {
             database: "mydb".to_string(),
             container: "mygraph".to_string(),
             key: "secret".to_string(),
+            secure_storage: false,
         };
 
         assert_eq!(
             config.display_info(),
             "myaccount.cosmos.azure.com/mydb/mygraph"
         );
+    }
+
+    #[test]
+    fn secure_storage_defaults_to_false_when_missing() {
+        let json = r#"{"type":"standard","name":"Test","host":"localhost","port":8182,"use_ssl":false}"#;
+        let config: ConnectionConfig = serde_json::from_str(json).unwrap();
+        match config {
+            ConnectionConfig::Standard { secure_storage, .. } => {
+                assert!(!secure_storage);
+            }
+            _ => panic!("Expected Standard variant"),
+        }
+    }
+
+    #[test]
+    fn secure_storage_cosmos_defaults_to_false_when_missing() {
+        let json = r#"{"type":"cosmos","name":"Test","endpoint":"test.cosmos.azure.com","database":"db","container":"c","key":"k"}"#;
+        let config: ConnectionConfig = serde_json::from_str(json).unwrap();
+        match config {
+            ConnectionConfig::Cosmos { secure_storage, .. } => {
+                assert!(!secure_storage);
+            }
+            _ => panic!("Expected Cosmos variant"),
+        }
     }
 }

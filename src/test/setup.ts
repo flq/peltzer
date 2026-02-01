@@ -32,3 +32,18 @@ vi.mock("@tauri-apps/api/window", () => ({
     setTitle: mockSetTitle,
   })),
 }));
+
+// Mock @choochmeque/tauri-plugin-biometry-api
+export const mockBiometryStatus = vi.fn().mockResolvedValue({ isAvailable: true, biometryType: 1 });
+export const mockSetData = vi.fn().mockResolvedValue(undefined);
+export const mockGetData = vi.fn().mockResolvedValue({ data: "{}" });
+export const mockHasData = vi.fn().mockResolvedValue(false);
+export const mockRemoveData = vi.fn().mockResolvedValue(undefined);
+
+vi.mock("@choochmeque/tauri-plugin-biometry-api", () => ({
+  checkStatus: mockBiometryStatus,
+  setData: mockSetData,
+  getData: mockGetData,
+  hasData: mockHasData,
+  removeData: mockRemoveData,
+}));

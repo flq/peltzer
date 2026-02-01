@@ -3,10 +3,11 @@
 
     interface Props {
         initial?: StandardConnectionConfig | null;
+        biometryAvailable?: boolean;
         onchange: (config: StandardConnectionConfig) => void;
     }
 
-    let {initial = null, onchange}: Props = $props();
+    let {initial = null, biometryAvailable = false, onchange}: Props = $props();
 
     let localValues = $state((() => initial)() ?? {
         type: "standard",
@@ -16,6 +17,7 @@
         username: "",
         password: "",
         use_ssl: false,
+        secure_storage: false,
     } satisfies StandardConnectionConfig);
 
     $effect(() => {
@@ -47,6 +49,10 @@
 <label class="checkbox-label">
     <input type="checkbox" bind:checked={localValues.use_ssl}/>
     Use SSL/TLS
+</label>
+<label class="checkbox-label" title={biometryAvailable ? "" : "Biometric authentication not available on this device"}>
+    <input type="checkbox" bind:checked={localValues.secure_storage} disabled={!biometryAvailable}/>
+    Secure storage (biometric)
 </label>
 
 <style>

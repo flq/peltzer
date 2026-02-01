@@ -9,6 +9,7 @@ vi.mock("../../lib/api", () => ({
   getSavedConnections: vi.fn(),
   saveConnection: vi.fn(),
   deleteConnection: vi.fn(),
+  getConnectionWithCredentials: vi.fn(),
 }));
 
 const mockStandardConnection: StandardConnectionConfig = {
@@ -17,6 +18,16 @@ const mockStandardConnection: StandardConnectionConfig = {
   host: "localhost",
   port: 8182,
   use_ssl: false,
+  secure_storage: false,
+};
+
+const mockSecureConnection: StandardConnectionConfig = {
+  type: "standard",
+  name: "Secure DB",
+  host: "localhost",
+  port: 8182,
+  use_ssl: false,
+  secure_storage: true,
 };
 
 const mockCosmosConnection: CosmosConnectionConfig = {
@@ -26,6 +37,7 @@ const mockCosmosConnection: CosmosConnectionConfig = {
   database: "graphdb",
   container: "mygraph",
   key: "secret-key",
+  secure_storage: false,
 };
 
 describe("ConnectionsPanel", () => {
@@ -33,6 +45,7 @@ describe("ConnectionsPanel", () => {
     vi.clearAllMocks();
     savedConnections.set([]);
     vi.mocked(api.getSavedConnections).mockResolvedValue([]);
+    vi.mocked(api.getConnectionWithCredentials).mockImplementation(async (config) => config);
   });
 
   it("renders connections heading and add button", async () => {
@@ -231,5 +244,52 @@ describe("ConnectionsPanel", () => {
     expect(screen.getByText("Select connection type:")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Standard" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Cosmos DB" })).toBeInTheDocument();
+  });
+
+  it("shows lock icon for secure connections", async () => {
+    savedConnections.set([mockSecureConnection]);
+    const onconnect = vi.fn();
+    render(ConnectionsPanel, { props: { onconnect } });
+
+    expect(screen.getByLabelText("Secure connection")).toBeInTheDocument();
+  });
+
+  it("does not show lock icon for non-secure connections", async () => {
+    savedConnections.set([mockStandardConnection]);
+    const onconnect = vi.fn();
+    render(ConnectionsPanel, { props: { onconnect } });
+
+    expect(screen.queryByLabelText("Secure connection")).not.toBeInTheDocument();
+  });
+
+  it("calls getConnectionWithCredentials when connecting to secure connection", async () => {
+    savedConnections.set([mockSecureConnection]);
+    const fullConfig = { ...mockSecureConnection, username: "user", password: "pass" };
+    vi.mocked(api.getConnectionWithCredentials).mockResolvedValue(fullConfig);
+    const onconnect = vi.fn();
+    render(ConnectionsPanel, { props: { onconnect } });
+
+    const connectionButton = screen.getByRole("button", { name: new RegExp(mockSecureConnection.name, "i") });
+    await fireEvent.click(connectionButton);
+
+    await waitFor(() => {
+      expect(api.getConnectionWithCredentials).toHaveBeenCalledWith(mockSecureConnection);
+    });
+    expect(onconnect).toHaveBeenCalledWith(fullConfig);
+  });
+
+  it("shows error when biometry fails", async () => {
+    savedConnections.set([mockSecureConnection]);
+    vi.mocked(api.getConnectionWithCredentials).mockRejectedValue(new Error("User cancelled biometry"));
+    const onconnect = vi.fn();
+    render(ConnectionsPanel, { props: { onconnect } });
+
+    const connectionButton = screen.getByRole("button", { name: new RegExp(mockSecureConnection.name, "i") });
+    await fireEvent.click(connectionButton);
+
+    await waitFor(() => {
+      expect(screen.getByText("User cancelled biometry")).toBeInTheDocument();
+    });
+    expect(onconnect).not.toHaveBeenCalled();
   });
 });

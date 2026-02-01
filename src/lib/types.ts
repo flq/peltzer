@@ -6,6 +6,7 @@ export interface StandardConnectionConfig {
   username?: string;
   password?: string;
   use_ssl: boolean;
+  secure_storage?: boolean;
 }
 
 export interface CosmosConnectionConfig {
@@ -15,6 +16,7 @@ export interface CosmosConnectionConfig {
   database: string;
   container: string;
   key: string;
+  secure_storage?: boolean;
 }
 
 export type ConnectionConfig = StandardConnectionConfig | CosmosConnectionConfig;

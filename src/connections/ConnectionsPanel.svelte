@@ -1,13 +1,13 @@
 <script lang="ts">
   import {onMount} from "svelte";
   import {savedConnections} from "../lib/stores";
-  import {getSavedConnections, deleteConnection, saveConnection} from "../lib/api";
+  import {getSavedConnections, deleteConnection, saveConnection, getConnectionWithCredentials} from "../lib/api";
   import {getName} from "../lib/types";
   import type {ConnectionConfig} from "../lib/types";
   import Button from "../components/Button.svelte";
   import Modal from "../components/Modal.svelte";
   import ConnectionForm from "./ConnectionForm.svelte";
-  import {PackagePlus} from "lucide-svelte";
+  import {PackagePlus, Lock} from "lucide-svelte";
 
   interface Props {
     onconnect: (config: ConnectionConfig) => void;
@@ -17,11 +17,22 @@
 
   let showModal = $state(false);
   let editingConnection = $state<ConnectionConfig | null>(null);
+  let connectError = $state<string | null>(null);
 
   onMount(async () => {
     const connections = await getSavedConnections();
     savedConnections.set(connections);
   });
+
+  async function handleConnect(config: ConnectionConfig) {
+    connectError = null;
+    try {
+      const configWithCredentials = await getConnectionWithCredentials(config);
+      onconnect(configWithCredentials);
+    } catch (err) {
+      connectError = err instanceof Error ? err.message : "Failed to unlock credentials";
+    }
+  }
 
   async function handleSave(connection: ConnectionConfig) {
     await saveConnection(connection);
@@ -52,12 +63,21 @@
   <div class="panel-container u-flex-column">
     <h1>Connections</h1>
 
+    {#if connectError}
+      <div class="connect-error">{connectError}</div>
+    {/if}
+
     {#if $savedConnections.length > 0}
       <div class="connection-list u-flex-column">
         {#each $savedConnections as conn (conn.name)}
           <div class="connection-item">
-            <Button kind="bare" class="connection-name" onclick={() => onconnect(conn)}>
-              {conn.name}
+            <Button kind="bare" class="connection-name" onclick={() => handleConnect(conn)}>
+              <span class="connection-name-row">
+                {conn.name}
+                {#if conn.secure_storage}
+                  <Lock class="icon-sm lock-icon" aria-label="Secure connection" />
+                {/if}
+              </span>
               <span class="connection-host">
                 {getName(conn)}
               </span>
@@ -155,5 +175,24 @@
     color: var(--text-secondary);
     text-align: center;
     padding: var(--spacer-2);
+  }
+
+  .connect-error {
+    padding: var(--spacer-075);
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--warning-color);
+    border-radius: var(--border-radius);
+    color: var(--warning-color);
+  }
+
+  .connection-name-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacer-025);
+  }
+
+  .connection-item :global(.lock-icon) {
+    color: var(--text-secondary);
+    flex-shrink: 0;
   }
 </style>

@@ -3,10 +3,11 @@
 
     interface Props {
         initial?: CosmosConnectionConfig | null;
+        biometryAvailable?: boolean;
         onchange: (config: CosmosConnectionConfig) => void;
     }
 
-    let {initial = null, onchange}: Props = $props();
+    let {initial = null, biometryAvailable = false, onchange}: Props = $props();
 
     let localValues = $state((() => initial)() ?? {
         type: "cosmos",
@@ -15,6 +16,7 @@
         database: "",
         container: "",
         key: "",
+        secure_storage: false,
     } satisfies CosmosConnectionConfig);
 
     $effect(() => {
@@ -48,6 +50,10 @@
     Key
     <input type="password" bind:value={localValues.key} placeholder="Primary key" required/>
 </label>
+<label class="checkbox-label" title={biometryAvailable ? "" : "Biometric authentication not available on this device"}>
+    <input type="checkbox" bind:checked={localValues.secure_storage} disabled={!biometryAvailable}/>
+    Secure storage (biometric)
+</label>
 
 <style>
     label {
@@ -55,6 +61,13 @@
         flex-direction: column;
         gap: 4px;
         color: var(--text-secondary);
+    }
+
+    label.checkbox-label {
+        margin-top: var(--spacer-1);
+        flex-direction: row;
+        align-items: center;
+        gap: var(--spacer-05);
     }
 
     input[type="text"],
