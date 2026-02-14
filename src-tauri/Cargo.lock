@@ -1458,6 +1458,7 @@ dependencies = [
 [[package]]
 name = "gremlin-client"
 version = "0.8.10"
+source = "git+https://github.com/flq/gremlin-rs?branch=peltzer-support#09a799a1c629d3679714b233753c4dc1462b6c88"
 dependencies = [
  "async-trait",
  "async-tungstenite",
