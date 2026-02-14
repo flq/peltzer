@@ -18,11 +18,12 @@
 
   let showModal = $state(false);
   let editingConnection = $state<ConnectionConfig | null>(null);
-  let connectError = $state<string | null>(null);
 
   // PIN modal state
   let showPinModal = $state(false);
   let pinModalTitle = $state("Enter PIN");
+  let pinError = $state<string | null>(null);
+  let pinPending = $state(false);
   let pendingAction = $state<{ type: "save" | "connect"; config: ConnectionConfig } | null>(null);
 
   onMount(async () => {
@@ -31,7 +32,6 @@
   });
 
   async function handleConnect(config: ConnectionConfig) {
-    connectError = null;
     if (config.secure_storage) {
       pendingAction = { type: "connect", config };
       pinModalTitle = `Enter PIN for "${config.name}"`;
@@ -43,6 +43,9 @@
 
   async function handlePinSubmit(pin: string) {
     if (!pendingAction) return;
+
+    pinPending = true;
+    pinError = null;
 
     try {
       if (pendingAction.type === "connect") {
@@ -59,16 +62,21 @@
         editingConnection = null;
         pendingAction = null;
       }
-    } catch (err) {
-      connectError = err instanceof Error ? err.message : "Operation failed";
-      showPinModal = false;
-      pendingAction = null;
+    } catch {
+      pinError = "The PIN you entered is wrong";
+    } finally {
+      pinPending = false;
     }
   }
 
   function handlePinCancel() {
     showPinModal = false;
+    pinError = null;
     pendingAction = null;
+  }
+
+  function handlePinClearError() {
+    pinError = null;
   }
 
   async function handleSave(connection: ConnectionConfig) {
@@ -105,10 +113,6 @@
 <div class="connections-panel">
   <div class="panel-container u-flex-column">
     <h1>Connections</h1>
-
-    {#if connectError}
-      <div class="connect-error">{connectError}</div>
-    {/if}
 
     {#if $savedConnections.length > 0}
       <div class="connection-list u-flex-column">
@@ -151,8 +155,11 @@
 <PinModal
   open={showPinModal}
   title={pinModalTitle}
+  error={pinError}
+  pending={pinPending}
   onsubmit={handlePinSubmit}
   oncancel={handlePinCancel}
+  onclearerror={handlePinClearError}
 />
 
 <style>
@@ -225,14 +232,6 @@
     color: var(--text-secondary);
     text-align: center;
     padding: var(--spacer-2);
-  }
-
-  .connect-error {
-    padding: var(--spacer-075);
-    background-color: var(--bg-tertiary);
-    border: 1px solid var(--warning-color);
-    border-radius: var(--border-radius);
-    color: var(--warning-color);
   }
 
   .connection-name-row {

@@ -1,34 +1,60 @@
 <script lang="ts">
     import Modal from "./Modal.svelte";
     import Button from "./Button.svelte";
+    import StatusMessage from "./StatusMessage.svelte";
 
     interface Props {
         open: boolean;
         title?: string;
+        error?: string | null;
+        pending?: boolean;
         onsubmit: (pin: string) => void;
         oncancel: () => void;
+        onclearerror?: () => void;
     }
 
-    let {open, title = "Enter PIN", onsubmit, oncancel}: Props = $props();
+    let {
+        open,
+        title = "Enter PIN",
+        error = null,
+        pending = false,
+        onsubmit,
+        oncancel,
+        onclearerror
+    }: Props = $props();
 
     let pin = $state("");
-    let error = $state<string | null>(null);
+    let validationError = $state<string | null>(null);
 
     function handleSubmit() {
         if (pin.length < 4) {
-            error = "PIN must be at least 4 characters";
+            validationError = "PIN must be at least 4 characters";
             return;
         }
-        error = null;
+        validationError = null;
         onsubmit(pin);
-        pin = "";
+    }
+
+    function handleInput() {
+        validationError = null;
+        onclearerror?.();
     }
 
     function handleClose() {
         pin = "";
-        error = null;
+        validationError = null;
         oncancel();
     }
+
+    // Reset pin when modal closes
+    $effect(() => {
+        if (!open) {
+            pin = "";
+            validationError = null;
+        }
+    });
+
+    let displayError = $derived(validationError || error);
 </script>
 
 <Modal {open} {title} onclose={handleClose}>
@@ -39,20 +65,22 @@
             <input
                 type="password"
                 bind:value={pin}
+                oninput={handleInput}
                 placeholder="Enter PIN"
                 required
                 autofocus
                 minlength="4"
+                disabled={pending}
             />
         </label>
 
-        {#if error}
-            <div class="error">{error}</div>
+        {#if displayError}
+            <StatusMessage type="error" message={displayError} />
         {/if}
 
         <div class="actions">
-            <Button kind="secondary" type="button" onclick={handleClose}>Cancel</Button>
-            <Button type="submit">Confirm</Button>
+            <Button kind="secondary" type="button" onclick={handleClose} disabled={pending}>Cancel</Button>
+            <Button type="submit" {pending}>Confirm</Button>
         </div>
     </form>
 </Modal>
@@ -71,11 +99,6 @@
 
     input {
         width: 100%;
-    }
-
-    .error {
-        color: var(--warning-color);
-        font-size: var(--font-size-small);
     }
 
     .actions {

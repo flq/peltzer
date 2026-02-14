@@ -1,6 +1,7 @@
 <script lang="ts">
     import type {ConnectionConfig} from "../lib/types";
     import Button from "../components/Button.svelte";
+    import StatusMessage from "../components/StatusMessage.svelte";
     import TestConnectionButton from "./TestConnectionButton.svelte";
     import StandardConnectionFields from "./StandardConnectionFields.svelte";
     import CosmosConnectionFields from "./CosmosConnectionFields.svelte";
@@ -78,9 +79,9 @@
 
         <div class="actions u-flex-column">
             {#if testSuccess}
-                <div class="test-success">{testSuccess}</div>
+                <StatusMessage type="success" message={testSuccess} />
             {:else if testError}
-                <div class="test-error">{testError}</div>
+                <StatusMessage type="error" message={testError} />
             {/if}
             <div class="form-actions">
                 <TestConnectionButton config={currentConfig} onsuccess={handleTestSuccess} onerror={handleTestError}/>
@@ -125,23 +126,5 @@
 
     .form-actions :global(button) {
         flex: 1;
-    }
-
-    .test-success,
-    .test-error {
-        margin-top: var(--spacer-15);
-        padding: var(--spacer-075);
-        background-color: var(--bg-tertiary);
-        border-radius: var(--border-radius);
-    }
-
-    .test-success {
-        border: 1px solid var(--success-color);
-        color: var(--success-color);
-    }
-
-    .test-error {
-        border: 1px solid var(--warning-color);
-        color: var(--warning-color);
     }
 </style>
