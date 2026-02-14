@@ -4,7 +4,7 @@
 - [ ] History / Tab. While using a Tab Ctrl+Arrow up goes back to the last query ran.
 - [ ] React to selection and execute only the selected part.
 - [ ] Save & Load queries to files - Two buttons (Open/Save) to persist queries as plain text .gremlin files. Store in the app data folder alongside connections.json (~Library/Application Support/com.peltzer.app/ on macOS). Default filename based on current date/time (e.g. query-2026-01-20-143052.gremlin).
-- [ ] In query & results pane, clicking into a value in quotes selects the whole value, ready for copying
+- [ ] In query & results pane, clicking into a valxue in quotes selects the whole value, ready for copying
 
 ## Done
 

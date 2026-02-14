@@ -24,7 +24,7 @@
   let pinModalTitle = $state("Enter PIN");
   let pinError = $state<string | null>(null);
   let pinPending = $state(false);
-  let pendingAction = $state<{ type: "save" | "connect"; config: ConnectionConfig } | null>(null);
+  let pendingAction = $state<{ type: "save" | "connect" | "edit"; config: ConnectionConfig } | null>(null);
 
   onMount(async () => {
     const connections = await getSavedConnections();
@@ -61,6 +61,12 @@
         showModal = false;
         editingConnection = null;
         pendingAction = null;
+      } else if (pendingAction.type === "edit") {
+        const configWithCredentials = await getConnectionWithCredentials(pendingAction.config, pin);
+        showPinModal = false;
+        pendingAction = null;
+        editingConnection = configWithCredentials;
+        showModal = true;
       }
     } catch {
       pinError = "The PIN you entered is wrong";
@@ -100,8 +106,14 @@
   }
 
   function handleEdit(config: ConnectionConfig | null) {
-    editingConnection = config;
-    showModal = true;
+    if (config?.secure_storage) {
+      pendingAction = { type: "edit", config };
+      pinModalTitle = `Enter PIN to edit "${config.name}"`;
+      showPinModal = true;
+    } else {
+      editingConnection = config;
+      showModal = true;
+    }
   }
 
   function handleModalClose() {

@@ -296,4 +296,57 @@ describe("ConnectionsPanel", () => {
     });
     expect(onconnect).toHaveBeenCalledWith(fullConfig);
   });
+
+  it("shows error in PIN modal when wrong PIN is entered", async () => {
+    savedConnections.set([mockSecureConnection]);
+    vi.mocked(api.getConnectionWithCredentials).mockRejectedValue(new Error("Invalid PIN"));
+    const onconnect = vi.fn();
+    render(ConnectionsPanel, { props: { onconnect } });
+
+    // Click secure connection
+    const connectionButton = screen.getByRole("button", { name: new RegExp(mockSecureConnection.name, "i") });
+    await fireEvent.click(connectionButton);
+
+    // Enter wrong PIN
+    const pinInput = screen.getByLabelText("PIN");
+    await fireEvent.input(pinInput, { target: { value: "9999" } });
+
+    // Confirm
+    const confirmButton = screen.getByRole("button", { name: "Confirm" });
+    await fireEvent.click(confirmButton);
+
+    // Error should show in modal, modal should stay open
+    await waitFor(() => {
+      expect(screen.getByText("The PIN you entered is wrong")).toBeInTheDocument();
+    });
+    expect(screen.getByLabelText("PIN")).toBeInTheDocument();
+    expect(onconnect).not.toHaveBeenCalled();
+  });
+
+  it("clears PIN error when user starts typing again", async () => {
+    savedConnections.set([mockSecureConnection]);
+    vi.mocked(api.getConnectionWithCredentials).mockRejectedValueOnce(new Error("Invalid PIN"));
+    const onconnect = vi.fn();
+    render(ConnectionsPanel, { props: { onconnect } });
+
+    // Click secure connection
+    const connectionButton = screen.getByRole("button", { name: new RegExp(mockSecureConnection.name, "i") });
+    await fireEvent.click(connectionButton);
+
+    // Enter wrong PIN and submit
+    const pinInput = screen.getByLabelText("PIN");
+    await fireEvent.input(pinInput, { target: { value: "9999" } });
+    await fireEvent.click(screen.getByRole("button", { name: "Confirm" }));
+
+    // Wait for error
+    await waitFor(() => {
+      expect(screen.getByText("The PIN you entered is wrong")).toBeInTheDocument();
+    });
+
+    // Start typing again
+    await fireEvent.input(pinInput, { target: { value: "1" } });
+
+    // Error should be cleared
+    expect(screen.queryByText("The PIN you entered is wrong")).not.toBeInTheDocument();
+  });
 });

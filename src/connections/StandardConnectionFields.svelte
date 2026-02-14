@@ -66,12 +66,19 @@
         margin-top: var(--spacer-1);
         flex-direction: row;
         align-items: center;
+        justify-content: flex-start;
         gap: var(--spacer-05);
+        width: 100%;
     }
 
     input[type="text"],
     input[type="password"],
     input[type="number"] {
         width: 100%;
+    }
+
+    input[type="checkbox"] {
+        width: auto;
+        flex-shrink: 0;
     }
 </style>

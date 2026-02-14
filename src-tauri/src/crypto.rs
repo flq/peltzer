@@ -11,9 +11,13 @@ use std::collections::HashMap;
 use tauri::AppHandle;
 use tauri_plugin_store::StoreExt;
 
-// Hardcoded seed - provides additional entropy beyond the PIN.
-// An attacker would need to decompile the binary to find this.
-const SEED: &[u8] = b"peltzer-credential-seed-2026-v1";
+// Seed provides additional entropy beyond the PIN.
+// Set PELTZER_SEED env var at compile time for release builds (via GitHub secrets).
+// Falls back to dev seed for local development.
+const SEED: &[u8] = match option_env!("PELTZER_SEED") {
+    Some(s) => s.as_bytes(),
+    None => b"peltzer-dev-seed-not-for-production",
+};
 
 const PBKDF2_ITERATIONS: u32 = 100_000;
 const CREDENTIALS_STORE: &str = "credentials.json";
