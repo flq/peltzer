@@ -29,5 +29,9 @@ gremlin-client = { path = "../../gremlin-rs/gremlin-client", features = ["tokio-
 # gremlin-client = { git = "https://github.com/flq/gremlin-rs", branch = "peltzer-support", features = ["tokio-runtime"] }
 tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
 futures = "0.3"
-tauri-plugin-biometry = "0.2"
+aes-gcm = "0.10"
+pbkdf2 = { version = "0.12", features = ["simple"] }
+sha2 = "0.10"
+rand = "0.8"
+base64 = "0.22"
 

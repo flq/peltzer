@@ -6,6 +6,7 @@
   import type {ConnectionConfig} from "../lib/types";
   import Button from "../components/Button.svelte";
   import Modal from "../components/Modal.svelte";
+  import PinModal from "../components/PinModal.svelte";
   import ConnectionForm from "./ConnectionForm.svelte";
   import {PackagePlus, Lock} from "lucide-svelte";
 
@@ -19,6 +20,11 @@
   let editingConnection = $state<ConnectionConfig | null>(null);
   let connectError = $state<string | null>(null);
 
+  // PIN modal state
+  let showPinModal = $state(false);
+  let pinModalTitle = $state("Enter PIN");
+  let pendingAction = $state<{ type: "save" | "connect"; config: ConnectionConfig } | null>(null);
+
   onMount(async () => {
     const connections = await getSavedConnections();
     savedConnections.set(connections);
@@ -26,20 +32,57 @@
 
   async function handleConnect(config: ConnectionConfig) {
     connectError = null;
-    try {
-      const configWithCredentials = await getConnectionWithCredentials(config);
-      onconnect(configWithCredentials);
-    } catch (err) {
-      connectError = err instanceof Error ? err.message : "Failed to unlock credentials";
+    if (config.secure_storage) {
+      pendingAction = { type: "connect", config };
+      pinModalTitle = `Enter PIN for "${config.name}"`;
+      showPinModal = true;
+    } else {
+      onconnect(config);
     }
   }
 
+  async function handlePinSubmit(pin: string) {
+    if (!pendingAction) return;
+
+    try {
+      if (pendingAction.type === "connect") {
+        const configWithCredentials = await getConnectionWithCredentials(pendingAction.config, pin);
+        showPinModal = false;
+        pendingAction = null;
+        onconnect(configWithCredentials);
+      } else if (pendingAction.type === "save") {
+        await saveConnection(pendingAction.config, pin);
+        const connections = await getSavedConnections();
+        savedConnections.set(connections);
+        showPinModal = false;
+        showModal = false;
+        editingConnection = null;
+        pendingAction = null;
+      }
+    } catch (err) {
+      connectError = err instanceof Error ? err.message : "Operation failed";
+      showPinModal = false;
+      pendingAction = null;
+    }
+  }
+
+  function handlePinCancel() {
+    showPinModal = false;
+    pendingAction = null;
+  }
+
   async function handleSave(connection: ConnectionConfig) {
-    await saveConnection(connection);
-    const connections = await getSavedConnections();
-    savedConnections.set(connections);
-    showModal = false;
-    editingConnection = null;
+    if (connection.secure_storage) {
+      pendingAction = { type: "save", config: connection };
+      pinModalTitle = "Set PIN for secure storage";
+      showPinModal = true;
+    } else {
+      await saveConnection(connection);
+      const connections = await getSavedConnections();
+      savedConnections.set(connections);
+      showModal = false;
+      editingConnection = null;
+    }
   }
 
   async function handleDelete(config: ConnectionConfig) {
@@ -104,6 +147,13 @@
     <ConnectionForm defaultConfig={editingConnection} onSave={handleSave}/>
   {/key}
 </Modal>
+
+<PinModal
+  open={showPinModal}
+  title={pinModalTitle}
+  onsubmit={handlePinSubmit}
+  oncancel={handlePinCancel}
+/>
 
 <style>
   .connections-panel {

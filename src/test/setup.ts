@@ -15,12 +15,18 @@ vi.mock("@tauri-apps/api/core", () => ({
 }));
 
 // Mock @tauri-apps/plugin-store
+export const mockStoreGet = vi.fn().mockResolvedValue(null);
+export const mockStoreSet = vi.fn().mockResolvedValue(undefined);
+export const mockStoreSave = vi.fn().mockResolvedValue(undefined);
+export const mockStoreDelete = vi.fn().mockResolvedValue(undefined);
+
 vi.mock("@tauri-apps/plugin-store", () => ({
   Store: {
     load: vi.fn().mockResolvedValue({
-      get: vi.fn().mockResolvedValue(null),
-      set: vi.fn().mockResolvedValue(undefined),
-      save: vi.fn().mockResolvedValue(undefined),
+      get: mockStoreGet,
+      set: mockStoreSet,
+      save: mockStoreSave,
+      delete: mockStoreDelete,
     }),
   },
 }));
@@ -33,17 +39,19 @@ vi.mock("@tauri-apps/api/window", () => ({
   })),
 }));
 
-// Mock @choochmeque/tauri-plugin-biometry-api
-export const mockBiometryStatus = vi.fn().mockResolvedValue({ isAvailable: true, biometryType: 1 });
-export const mockSetData = vi.fn().mockResolvedValue(undefined);
-export const mockGetData = vi.fn().mockResolvedValue({ data: "{}" });
-export const mockHasData = vi.fn().mockResolvedValue(false);
-export const mockRemoveData = vi.fn().mockResolvedValue(undefined);
-
-vi.mock("@choochmeque/tauri-plugin-biometry-api", () => ({
-  checkStatus: mockBiometryStatus,
-  setData: mockSetData,
-  getData: mockGetData,
-  hasData: mockHasData,
-  removeData: mockRemoveData,
-}));
+// Mock crypto.randomUUID (not implemented in jsdom, needed by TabContainer)
+if (!globalThis.crypto?.randomUUID) {
+  Object.defineProperty(globalThis, "crypto", {
+    value: {
+      ...globalThis.crypto,
+      randomUUID: () => {
+        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+          const r = (Math.random() * 16) | 0;
+          const v = c === "x" ? r : (r & 0x3) | 0x8;
+          return v.toString(16);
+        });
+      },
+    },
+    writable: true,
+  });
+}

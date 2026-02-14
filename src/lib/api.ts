@@ -5,8 +5,12 @@ import type {
   StandardConnectionConfig,
   CosmosConnectionConfig,
 } from "./types";
-import * as biometry from "./biometry";
-import type { Credentials } from "./biometry";
+
+interface Credentials {
+  username?: string;
+  password?: string;
+  key?: string;
+}
 
 let store: Store | null = null;
 
@@ -44,15 +48,25 @@ export async function getSavedConnections(): Promise<ConnectionConfig[]> {
   return connections ?? [];
 }
 
-export async function saveConnection(config: ConnectionConfig): Promise<void> {
+export async function saveConnection(
+  config: ConnectionConfig,
+  pin?: string
+): Promise<void> {
   const s = await getStore();
   const connections = await getSavedConnections();
 
   let configToStore = config;
 
   if (config.secure_storage) {
+    if (!pin) {
+      throw new Error("PIN required for secure storage");
+    }
     const { sanitized, credentials } = extractSensitiveFields(config);
-    await biometry.storeCredentials(config.name, credentials);
+    await invoke("store_credentials", {
+      connectionName: config.name,
+      credentials,
+      pin,
+    });
     configToStore = sanitized;
   }
 
@@ -68,17 +82,21 @@ export async function saveConnection(config: ConnectionConfig): Promise<void> {
 }
 
 export async function getConnectionWithCredentials(
-  config: ConnectionConfig
+  config: ConnectionConfig,
+  pin?: string
 ): Promise<ConnectionConfig> {
   if (!config.secure_storage) {
     return config;
   }
 
-  const credentials = await biometry.retrieveCredentials(
-    config.name,
-    `Unlock credentials for "${config.name}"`
-  );
+  if (!pin) {
+    throw new Error("PIN required for secure connection");
+  }
 
+  const credentials = await invoke<Credentials>("retrieve_credentials", {
+    connectionName: config.name,
+    pin,
+  });
   return { ...config, ...credentials };
 }
 
@@ -89,7 +107,7 @@ export async function deleteConnection(name: string): Promise<void> {
 
   if (conn?.secure_storage) {
     try {
-      await biometry.removeCredentials(name);
+      await invoke("remove_credentials", { connectionName: name });
     } catch {
       // Ignore errors if credentials don't exist
     }

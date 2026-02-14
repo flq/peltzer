@@ -72,7 +72,7 @@ describe("ConnectionsPanel", () => {
     expect(screen.getByText(`${mockStandardConnection.host}:${mockStandardConnection.port}`)).toBeInTheDocument();
   });
 
-  it("calls onconnect when clicking a connection name", async () => {
+  it("calls onconnect directly for non-secure connections", async () => {
     savedConnections.set([mockStandardConnection]);
     const onconnect = vi.fn();
     render(ConnectionsPanel, { props: { onconnect } });
@@ -91,7 +91,6 @@ describe("ConnectionsPanel", () => {
     await fireEvent.click(addButton);
 
     expect(screen.getByRole("heading", { name: "New Connection" })).toBeInTheDocument();
-    // New connection shows type selector first
     expect(screen.getByText("Select connection type:")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Standard" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Cosmos DB" })).toBeInTheDocument();
@@ -190,7 +189,6 @@ describe("ConnectionsPanel", () => {
     await fireEvent.click(editButton);
 
     expect(screen.getByText("Edit Connection")).toBeInTheDocument();
-    // Should show Standard form fields, not type selector
     expect(screen.queryByText("Select connection type:")).not.toBeInTheDocument();
     expect(screen.getByLabelText("Host")).toBeInTheDocument();
     expect(screen.getByLabelText("Port")).toBeInTheDocument();
@@ -207,7 +205,6 @@ describe("ConnectionsPanel", () => {
     await fireEvent.click(editButton);
 
     expect(screen.getByText("Edit Connection")).toBeInTheDocument();
-    // Should show Cosmos form fields, not type selector
     expect(screen.queryByText("Select connection type:")).not.toBeInTheDocument();
     expect(screen.getByLabelText("Endpoint")).toBeInTheDocument();
     expect(screen.getByLabelText("Database")).toBeInTheDocument();
@@ -262,34 +259,41 @@ describe("ConnectionsPanel", () => {
     expect(screen.queryByLabelText("Secure connection")).not.toBeInTheDocument();
   });
 
-  it("calls getConnectionWithCredentials when connecting to secure connection", async () => {
+  it("shows PIN modal when clicking a secure connection", async () => {
+    savedConnections.set([mockSecureConnection]);
+    const onconnect = vi.fn();
+    render(ConnectionsPanel, { props: { onconnect } });
+
+    const connectionButton = screen.getByRole("button", { name: new RegExp(mockSecureConnection.name, "i") });
+    await fireEvent.click(connectionButton);
+
+    // PIN modal should appear
+    expect(screen.getByText(`Enter PIN for "${mockSecureConnection.name}"`)).toBeInTheDocument();
+    expect(screen.getByLabelText("PIN")).toBeInTheDocument();
+  });
+
+  it("connects with PIN after entering it in modal", async () => {
     savedConnections.set([mockSecureConnection]);
     const fullConfig = { ...mockSecureConnection, username: "user", password: "pass" };
     vi.mocked(api.getConnectionWithCredentials).mockResolvedValue(fullConfig);
     const onconnect = vi.fn();
     render(ConnectionsPanel, { props: { onconnect } });
 
+    // Click secure connection
     const connectionButton = screen.getByRole("button", { name: new RegExp(mockSecureConnection.name, "i") });
     await fireEvent.click(connectionButton);
 
+    // Enter PIN
+    const pinInput = screen.getByLabelText("PIN");
+    await fireEvent.input(pinInput, { target: { value: "1234" } });
+
+    // Confirm
+    const confirmButton = screen.getByRole("button", { name: "Confirm" });
+    await fireEvent.click(confirmButton);
+
     await waitFor(() => {
-      expect(api.getConnectionWithCredentials).toHaveBeenCalledWith(mockSecureConnection);
+      expect(api.getConnectionWithCredentials).toHaveBeenCalledWith(mockSecureConnection, "1234");
     });
     expect(onconnect).toHaveBeenCalledWith(fullConfig);
-  });
-
-  it("shows error when biometry fails", async () => {
-    savedConnections.set([mockSecureConnection]);
-    vi.mocked(api.getConnectionWithCredentials).mockRejectedValue(new Error("User cancelled biometry"));
-    const onconnect = vi.fn();
-    render(ConnectionsPanel, { props: { onconnect } });
-
-    const connectionButton = screen.getByRole("button", { name: new RegExp(mockSecureConnection.name, "i") });
-    await fireEvent.click(connectionButton);
-
-    await waitFor(() => {
-      expect(screen.getByText("User cancelled biometry")).toBeInTheDocument();
-    });
-    expect(onconnect).not.toHaveBeenCalled();
   });
 });
