@@ -48,6 +48,16 @@ cd src-tauri && cargo test    # Backend tests
 
 Use `/verify` after code changes to run all builds and tests.
 
+### Visual Dev Mode
+
+```bash
+npm run dev:mock       # Frontend with mocked Tauri backend (no Rust needed)
+```
+
+Runs the Svelte frontend on `http://localhost:1430` with all Tauri APIs replaced by in-memory mocks (`src/lib/mock-tauri.ts`). The app loads with a seed "Local TinkerPop" connection and returns canned query results.
+
+Use this together with the Playwright MCP server (configured in `.mcp.json`) to visually inspect the UI in a real browser — useful for catching layout issues that unit tests miss. Start `npm run dev:mock`, then use Playwright MCP tools to navigate to `http://localhost:1430` and interact with the page.
+
 ## Code Guidelines
 
 - **Comments explain why, not what** - Don't write comments that repeat what the code does. Comments should explain intent, tradeoffs, or non-obvious behavior.

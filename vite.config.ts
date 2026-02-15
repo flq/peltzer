@@ -1,8 +1,9 @@
 import { defineConfig } from "vite";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
+import path from "path";
 
-// @ts-expect-error process is a nodejs global
 const host = process.env.TAURI_DEV_HOST;
+const mockTauri = process.env.MOCK_TAURI === "true";
 
 // https://vitejs.dev/config/
 export default defineConfig(async () => ({
@@ -25,6 +26,13 @@ export default defineConfig(async () => ({
   // Resolve configuration for proper Svelte 5 support in tests
   resolve: {
     conditions: ["browser", "development"],
+    ...(mockTauri && {
+      alias: {
+        "@tauri-apps/api/core": path.resolve("src/lib/mock-tauri.ts"),
+        "@tauri-apps/plugin-store": path.resolve("src/lib/mock-tauri.ts"),
+        "@tauri-apps/api/window": path.resolve("src/lib/mock-tauri.ts"),
+      },
+    }),
   },
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
