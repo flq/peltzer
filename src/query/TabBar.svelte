@@ -17,7 +17,7 @@
   {#each tabs as tab, index (tab.id)}
     <div class="tab" class:active={tab.id === activeTabId}>
       <button class="tab-label" onclick={() => onSelectTab(tab.id)}>
-        Query {index + 1}
+        {tab.filePath ? tab.filePath.split(/[\\/]/).pop() : `Query ${index + 1}`}
       </button>
       <Button kind="bare" size="small" class="tab-close" onclick={() => onCloseTab(tab.id)} title="Close tab">
         <X class="icon-sm" />

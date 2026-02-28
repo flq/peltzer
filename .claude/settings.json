@@ -47,5 +47,8 @@
       "mcp__playwright__browser_install",
       "mcp__playwright__browser_run_code"
     ]
+  },
+  "enabledPlugins": {
+    "superpowers@claude-plugins-official": true
   }
 }

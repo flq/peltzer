@@ -85,6 +85,14 @@
     onDisconnect();
   }
 
+  function handleOpenFile() {
+    tabContainer.openFile();
+  }
+
+  function handleSaveFile() {
+    tabContainer.saveFile();
+  }
+
   function handleKeydown(e: KeyboardEvent) {
     if (e.ctrlKey || e.metaKey) {
       if (e.key === "Enter") {
@@ -93,6 +101,12 @@
       } else if (e.key === "t") {
         e.preventDefault();
         handleAddTab();
+      } else if (e.key === "s") {
+        e.preventDefault();
+        handleSaveFile();
+      } else if (e.key === "o") {
+        e.preventDefault();
+        handleOpenFile();
       } else if (e.key === "Tab") {
         e.preventDefault();
         if (e.shiftKey) {
@@ -115,6 +129,8 @@
     onExecute={handleExecute}
     onAddTab={handleAddTab}
     onDisconnect={handleDisconnect}
+    onOpenFile={handleOpenFile}
+    onSaveFile={handleSaveFile}
   />
   <TabContainer bind:this={tabContainer} onStateChange={handleStateChange} />
 </div>

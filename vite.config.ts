@@ -31,6 +31,8 @@ export default defineConfig(async () => ({
         "@tauri-apps/api/core": path.resolve("src/lib/mock-tauri.ts"),
         "@tauri-apps/plugin-store": path.resolve("src/lib/mock-tauri.ts"),
         "@tauri-apps/api/window": path.resolve("src/lib/mock-tauri.ts"),
+        "@tauri-apps/plugin-dialog": path.resolve("src/lib/mock-tauri.ts"),
+        "@tauri-apps/plugin-fs": path.resolve("src/lib/mock-tauri.ts"),
       },
     }),
   },

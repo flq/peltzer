@@ -90,3 +90,22 @@ export class Store {
 export function getCurrentWindow() {
   return { setTitle: async () => {} };
 }
+
+// --- dialog (replaces @tauri-apps/plugin-dialog) ---
+
+export async function open(_options?: unknown): Promise<string | null> {
+  // In mock mode, return null (cancelled). Use Playwright for interactive testing.
+  return null;
+}
+
+export async function save(_options?: unknown): Promise<string | null> {
+  return null;
+}
+
+// --- fs (replaces @tauri-apps/plugin-fs) ---
+
+export async function readTextFile(_path: string): Promise<string> {
+  return "";
+}
+
+export async function writeTextFile(_path: string, _content: string): Promise<void> {}

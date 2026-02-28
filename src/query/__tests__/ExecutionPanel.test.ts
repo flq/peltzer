@@ -4,10 +4,16 @@ import ExecutionPanel from "../ExecutionPanel.svelte";
 import { activeConnection } from "../../lib/stores";
 import { queryStore } from "../queryStore";
 import * as api from "../../lib/api";
+import * as fileIo from "../../lib/file-io";
 
 // Mock the API module
 vi.mock("../../lib/api", () => ({
   executeQuery: vi.fn(),
+}));
+
+vi.mock("../../lib/file-io", () => ({
+  openQueryFile: vi.fn(),
+  saveQueryToFile: vi.fn(),
 }));
 
 const defaultProps = {
@@ -350,6 +356,45 @@ describe("ExecutionPanel", () => {
       // Press Ctrl+Shift+Tab again to wrap to tab 3
       await fireEvent.keyDown(window, { key: "Tab", ctrlKey: true, shiftKey: true });
       expect(screen.getByRole("textbox")).toHaveValue("third query");
+    });
+  });
+
+  describe("file operations", () => {
+    it("shows Open and Save buttons", () => {
+      render(ExecutionPanel, { props: defaultProps });
+
+      expect(screen.getByRole("button", { name: /open file/i })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /save file/i })).toBeInTheDocument();
+    });
+
+    it("opens file into new tab on Cmd+O", async () => {
+      vi.mocked(fileIo.openQueryFile).mockResolvedValue({
+        filePath: "/tmp/test.gremlin",
+        content: "g.V().has('name','Alice')",
+      });
+
+      render(ExecutionPanel, { props: defaultProps });
+
+      await fireEvent.keyDown(window, { key: "o", metaKey: true });
+
+      await waitFor(() => {
+        // New tab should have the file content
+        expect(screen.getByRole("textbox")).toHaveValue("g.V().has('name','Alice')");
+        // Tab bar should show the filename
+        expect(screen.getByText("test.gremlin")).toBeInTheDocument();
+      });
+    });
+
+    it("saves current tab query on Cmd+S", async () => {
+      vi.mocked(fileIo.saveQueryToFile).mockResolvedValue("/tmp/saved.gremlin");
+
+      render(ExecutionPanel, { props: defaultProps });
+
+      await fireEvent.keyDown(window, { key: "s", metaKey: true });
+
+      await waitFor(() => {
+        expect(fileIo.saveQueryToFile).toHaveBeenCalledWith("g.V().limit(10)", undefined);
+      });
     });
   });
 });

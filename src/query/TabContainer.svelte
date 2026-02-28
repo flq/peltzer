@@ -9,6 +9,8 @@
   import TabBar from "./TabBar.svelte";
   import QueryTab from "./QueryTab.svelte";
   import { queryStore } from "./queryStore";
+  import { openQueryFile, saveQueryToFile } from "../lib/file-io";
+  import { toast } from "../lib/toastStore";
 
   interface Props {
     onStateChange?: (state: TabContainerState) => void;
@@ -68,6 +70,35 @@
     tabs = [createNewTab()];
     activeTabId = tabs[0].id;
     queryStore.reset();
+  }
+
+  export async function openFile() {
+    if (!canAddTab) return;
+    try {
+      const result = await openQueryFile();
+      if (!result) return;
+      const newTab: Tab = {
+        id: crypto.randomUUID(),
+        queryText: result.content,
+        filePath: result.filePath,
+      };
+      tabs = [...tabs, newTab];
+      activeTabId = newTab.id;
+    } catch (e) {
+      toast(`Failed to open file: ${e}`, "error");
+    }
+  }
+
+  export async function saveFile() {
+    if (!activeTab) return;
+    try {
+      const savedPath = await saveQueryToFile(activeTab.queryText, activeTab.filePath);
+      if (savedPath) {
+        activeTab.filePath = savedPath;
+      }
+    } catch (e) {
+      toast(`Failed to save file: ${e}`, "error");
+    }
   }
 
   function selectTab(id: string) {

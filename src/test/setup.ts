@@ -39,6 +39,18 @@ vi.mock("@tauri-apps/api/window", () => ({
   })),
 }));
 
+// Mock @tauri-apps/plugin-dialog
+vi.mock("@tauri-apps/plugin-dialog", () => ({
+  open: vi.fn().mockResolvedValue(null),
+  save: vi.fn().mockResolvedValue(null),
+}));
+
+// Mock @tauri-apps/plugin-fs
+vi.mock("@tauri-apps/plugin-fs", () => ({
+  readTextFile: vi.fn().mockResolvedValue(""),
+  writeTextFile: vi.fn().mockResolvedValue(undefined),
+}));
+
 // Mock crypto.randomUUID (not implemented in jsdom, needed by TabContainer)
 if (!globalThis.crypto?.randomUUID) {
   Object.defineProperty(globalThis, "crypto", {
