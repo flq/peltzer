@@ -1,6 +1,6 @@
 <script lang="ts">
   import Button from "../components/Button.svelte";
-  import { Play, FilePlusCorner, Unplug, FolderOpen, Save } from "lucide-svelte";
+  import { Play, FilePlusCorner, Unplug, FolderOpen, Save, History } from "lucide-svelte";
 
   interface Props {
     disabled?: boolean;
@@ -11,6 +11,7 @@
     onAddTab: () => void;
     onOpenFile: () => void;
     onSaveFile: () => void;
+    onToggleHistory: () => void;
   }
 
   let {
@@ -22,6 +23,7 @@
     onAddTab,
     onOpenFile,
     onSaveFile,
+    onToggleHistory,
   }: Props = $props();
 </script>
 
@@ -33,6 +35,9 @@
     </Button>
     <Button kind="secondary" onclick={onSaveFile} title="Save File (Cmd+S)">
       <Save class="icon-md" />
+    </Button>
+    <Button kind="secondary" onclick={onToggleHistory} title="History (Ctrl+H)">
+      <History class="icon-md" />
     </Button>
     <Button onclick={onExecute} disabled={disabled || isExecuting} pending={isExecuting} title="Execute (Ctrl+Enter)">
       <Play class="icon-md" />

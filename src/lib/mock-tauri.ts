@@ -68,6 +68,13 @@ export class Store {
       const m = new Map<string, unknown>();
       if (name === "connections.json") {
         m.set("connections", [seedConnection]);
+      } else if (name === "history.json") {
+        m.set("history", [
+          { query: "g.V().has('name', 'marko').out('knows').values('name')" },
+          { query: "g.E().hasLabel('knows').count()" },
+          { query: "g.V().limit(10).valueMap()" },
+          { query: "g.V().count()" },
+        ]);
       }
       storeData.set(name, m);
     }

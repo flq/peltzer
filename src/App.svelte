@@ -1,12 +1,21 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import ConnectionsPanel from "./connections/ConnectionsPanel.svelte";
   import ExecutionPanel from "./query/ExecutionPanel.svelte";
   import ToastContainer from "./components/ToastContainer.svelte";
   import { activeConnection, isConnected } from "./lib/stores";
   import { connect, disconnect } from "./lib/api";
   import { toast } from "./lib/toastStore";
+  import { historyStore } from "./query/historyStore";
   import { getCurrentWindow } from "@tauri-apps/api/window";
   import type { ConnectionConfig } from "./lib/types";
+
+  onMount(async () => {
+    await historyStore.load();
+    window.addEventListener("beforeunload", () => {
+      historyStore.persist();
+    });
+  });
 
   async function handleConnect(config: ConnectionConfig) {
     try {
@@ -28,6 +37,7 @@
       toast(`Disconnect error: ${e}`, "error");
       return;
     }
+    await historyStore.persist();
     await getCurrentWindow().setTitle("Peltzer");
   }
 </script>

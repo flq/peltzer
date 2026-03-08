@@ -4,11 +4,13 @@
   Component Hierarchy:
   ────────────────────
   ExecutionPanel
-  ├── QueryHeader (buttons: Execute, New Tab, Disconnect)
-  └── TabContainer (tab management)
-      ├── TabBar (tab headers, visible when 2+ tabs)
-      └── QueryTab (textarea + results)
-          └── ResultsPane (results display)
+  ├── QueryHeader (buttons: Execute, New Tab, History, Disconnect)
+  └── .tab-area (position: relative, fills remaining height)
+      ├── TabContainer (tab management)
+      │   ├── TabBar (tab headers, visible when 2+ tabs)
+      │   └── QueryTab (textarea + results)
+      │       └── ResultsPane (results display)
+      └── HistoryPanel (absolutely positioned overlay, shown when showHistory=true)
 
   queryStore Access:
   ──────────────────
@@ -25,9 +27,11 @@
 <script lang="ts">
   import QueryHeader from "./QueryHeader.svelte";
   import TabContainer, { type TabContainerState } from "./TabContainer.svelte";
+  import HistoryPanel from "./HistoryPanel.svelte";
   import { isConnected } from "../lib/stores";
   import { executeQuery } from "../lib/api";
   import { queryStore } from "./queryStore";
+  import { historyStore } from "./historyStore";
 
   interface Props {
     onDisconnect: () => void;
@@ -37,6 +41,7 @@
 
   let tabContainer: TabContainer;
   let containerState = $state<TabContainerState>({ canAddTab: true });
+  let showHistory = $state(false);
 
   function handleStateChange(state: TabContainerState) {
     containerState = state;
@@ -57,7 +62,6 @@
 
     queryStore.setExecuting(tabId);
 
-    // Execute and write results back to store
     executeQuery(query)
       .then((result) => {
         let resultCount = "";
@@ -70,6 +74,7 @@
           // non-JSON result, no count
         }
         queryStore.setResult(tabId, result, resultCount);
+        historyStore.add(query);
       })
       .catch((e) => {
         queryStore.setResult(tabId, `Error: ${e}`, "");
@@ -93,11 +98,23 @@
     tabContainer.saveFile();
   }
 
+  function handleToggleHistory() {
+    showHistory = !showHistory;
+  }
+
+  function handleLoadHistoryEntry(query: string) {
+    tabContainer.setActiveQuery(query);
+    showHistory = false;
+  }
+
   function handleKeydown(e: KeyboardEvent) {
     if (e.ctrlKey || e.metaKey) {
       if (e.key === "Enter") {
         e.preventDefault();
         handleExecute();
+      } else if (e.key === "h") {
+        e.preventDefault();
+        handleToggleHistory();
       } else if (e.key === "t") {
         e.preventDefault();
         handleAddTab();
@@ -115,6 +132,8 @@
           tabContainer.nextTab();
         }
       }
+    } else if (e.key === "Escape" && showHistory) {
+      showHistory = false;
     }
   }
 </script>
@@ -131,13 +150,42 @@
     onDisconnect={handleDisconnect}
     onOpenFile={handleOpenFile}
     onSaveFile={handleSaveFile}
+    onToggleHistory={handleToggleHistory}
   />
-  <TabContainer bind:this={tabContainer} onStateChange={handleStateChange} />
+  <div class="tab-area">
+    <TabContainer bind:this={tabContainer} onStateChange={handleStateChange} />
+    {#if showHistory}
+      <div class="history-overlay">
+        <HistoryPanel
+          entries={$historyStore}
+          onClose={() => (showHistory = false)}
+          onSelectEntry={handleLoadHistoryEntry}
+        />
+      </div>
+    {/if}
+  </div>
 </div>
 
 <style>
   .execution-panel {
     height: 100%;
     overflow: hidden;
+  }
+
+  .tab-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .history-overlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 320px;
+    z-index: 10;
   }
 </style>

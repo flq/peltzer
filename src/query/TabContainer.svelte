@@ -101,6 +101,10 @@
     }
   }
 
+  export function setActiveQuery(query: string) {
+    updateQueryText(query);
+  }
+
   function selectTab(id: string) {
     activeTabId = id;
   }

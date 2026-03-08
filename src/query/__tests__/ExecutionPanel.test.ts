@@ -5,6 +5,7 @@ import { activeConnection } from "../../lib/stores";
 import { queryStore } from "../queryStore";
 import * as api from "../../lib/api";
 import * as fileIo from "../../lib/file-io";
+import * as historyStoreModule from "../historyStore";
 
 // Mock the API module
 vi.mock("../../lib/api", () => ({
@@ -14,6 +15,16 @@ vi.mock("../../lib/api", () => ({
 vi.mock("../../lib/file-io", () => ({
   openQueryFile: vi.fn(),
   saveQueryToFile: vi.fn(),
+}));
+
+vi.mock("../historyStore", () => ({
+  historyStore: {
+    subscribe: vi.fn((run: (val: never[]) => void) => { run([]); return () => {}; }),
+    add: vi.fn(),
+    persist: vi.fn(),
+    load: vi.fn(),
+    clear: vi.fn(),
+  },
 }));
 
 const defaultProps = {
@@ -394,6 +405,72 @@ describe("ExecutionPanel", () => {
 
       await waitFor(() => {
         expect(fileIo.saveQueryToFile).toHaveBeenCalledWith("g.V().limit(10)", undefined);
+      });
+    });
+  });
+
+  describe("history", () => {
+    it("shows history button", () => {
+      render(ExecutionPanel, { props: defaultProps });
+      expect(screen.getByRole("button", { name: /history/i })).toBeInTheDocument();
+    });
+
+    it("opens history panel on history button click", async () => {
+      render(ExecutionPanel, { props: defaultProps });
+
+      await fireEvent.click(screen.getByRole("button", { name: /history/i }));
+
+      expect(screen.getByText("History")).toBeInTheDocument();
+    });
+
+    it("opens history panel with Ctrl+H", async () => {
+      render(ExecutionPanel, { props: defaultProps });
+
+      await fireEvent.keyDown(window, { key: "h", ctrlKey: true });
+
+      expect(screen.getByText("History")).toBeInTheDocument();
+    });
+
+    it("closes history panel on Escape", async () => {
+      render(ExecutionPanel, { props: defaultProps });
+
+      await fireEvent.click(screen.getByRole("button", { name: /history/i }));
+      expect(screen.getByText("History")).toBeInTheDocument();
+
+      await fireEvent.keyDown(window, { key: "Escape" });
+      expect(screen.queryByText("History")).not.toBeInTheDocument();
+    });
+
+    it("closes history panel after selecting a history entry", async () => {
+      // Set up historyStore mock to return one entry
+      vi.mocked(historyStoreModule.historyStore.subscribe).mockImplementationOnce((run) => {
+        run([{ query: "g.V().count()" }]);
+        return () => {};
+      });
+
+      render(ExecutionPanel, { props: defaultProps });
+
+      // Open the history panel
+      await fireEvent.click(screen.getByRole("button", { name: /history/i }));
+      expect(screen.getByText("History")).toBeInTheDocument();
+
+      // Click a history entry
+      await fireEvent.click(screen.getByText("g.V().count()"));
+
+      // Panel should be closed
+      expect(screen.queryByText("History")).not.toBeInTheDocument();
+    });
+
+    it("calls historyStore.add after successful execution", async () => {
+      activeConnection.set(mockConnection);
+      vi.mocked(api.executeQuery).mockResolvedValue('["result"]');
+
+      render(ExecutionPanel, { props: defaultProps });
+
+      await fireEvent.click(screen.getByRole("button", { name: /execute/i }));
+
+      await waitFor(() => {
+        expect(historyStoreModule.historyStore.add).toHaveBeenCalledWith("g.V().limit(10)");
       });
     });
   });
