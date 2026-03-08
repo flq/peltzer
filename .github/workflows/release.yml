@@ -21,6 +21,17 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-tags: true
+
+      - name: Extract tag annotation
+        id: tag_notes
+        shell: bash
+        run: |
+          NOTES=$(git tag -l --format='%(contents)' "${{ github.ref_name }}")
+          echo "notes<<EOF" >> $GITHUB_OUTPUT
+          echo "$NOTES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -43,7 +54,7 @@ jobs:
         with:
           tagName: ${{ github.ref_name }}
           releaseName: 'Peltzer ${{ github.ref_name }}'
-          releaseBody: 'See the assets below to download the installer for your platform.'
+          releaseBody: '${{ steps.tag_notes.outputs.notes }}'
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}

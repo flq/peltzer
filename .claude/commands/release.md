@@ -48,18 +48,36 @@ git add src-tauri/tauri.conf.json
 git commit -m "Bump version to <NEW_VERSION>"
 ```
 
-## Step 7: Create and push the tag
+## Step 7: Suggest release notes
+
+Get the commits since the last tag:
 
 ```bash
-git tag v<NEW_VERSION>
+git log $(git describe --tags --abbrev=0)..HEAD --oneline
+```
+
+If there are no previous tags, use all commits: `git log --oneline`.
+
+Read the commit messages and write a short human-readable summary — 2–5 bullet points in plain English, e.g.:
+- "Introduced query history panel"
+- "Fixed connection timeout on reconnect"
+
+Avoid technical jargon and git commit IDs. Show the suggested notes to the user and ask them to confirm or edit before continuing.
+
+## Step 8: Create an annotated tag and push
+
+Create an annotated tag with the confirmed release notes embedded as the tag message:
+
+```bash
+git tag -a v<NEW_VERSION> -m "<CONFIRMED_RELEASE_NOTES>"
 git push origin main v<NEW_VERSION>
 ```
 
-Push both the commit and the tag together.
+Push both the commit and the tag together. The GitHub Actions workflow will extract the tag annotation and use it as the release body automatically — no further steps needed.
 
-## Step 8: Report
+## Step 9: Report
 
 Tell the user:
 - The new version (e.g., `v0.2.0`)
-- That the GitHub Actions release workflow should now be running
-- They can check progress at the repo's Actions tab
+- That the GitHub Actions release workflow is running and will use the tag annotation as the release notes
+- They can review and publish the draft at the repo's Releases page
