@@ -24,6 +24,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Fetch annotated tags
+        run: git fetch --tags --force
+
       - name: Extract tag annotation
         id: tag_notes
         shell: bash
