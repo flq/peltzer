@@ -26,12 +26,10 @@ describe("HistoryPanel", () => {
     expect(screen.getByText("No history yet")).toBeInTheDocument();
   });
 
-  it("truncates long queries to 80 chars with ellipsis", () => {
+  it("renders full query text (visual truncation handled by CSS)", () => {
     const longQuery = "g.V().has('name', 'marko').out('knows').out('knows').values('name').dedup().fold()_extra";
     render(HistoryPanel, { props: { ...defaultProps, entries: [{ query: longQuery }] } });
-    const text = screen.getByRole("button", { name: /g\.V/ }).textContent ?? "";
-    expect(text.length).toBeLessThanOrEqual(82); // 80 + "…"
-    expect(text).toContain("…");
+    expect(screen.getByText(longQuery)).toBeInTheDocument();
   });
 
   it("calls onSelectEntry and onClose when entry is clicked", async () => {

@@ -155,13 +155,11 @@
   <div class="tab-area">
     <TabContainer bind:this={tabContainer} onStateChange={handleStateChange} />
     {#if showHistory}
-      <div class="history-overlay">
-        <HistoryPanel
-          entries={$historyStore}
-          onClose={() => (showHistory = false)}
-          onSelectEntry={handleLoadHistoryEntry}
-        />
-      </div>
+      <HistoryPanel
+        entries={$historyStore}
+        onClose={() => (showHistory = false)}
+        onSelectEntry={handleLoadHistoryEntry}
+      />
     {/if}
   </div>
 </div>
@@ -180,12 +178,4 @@
     overflow: hidden;
   }
 
-  .history-overlay {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: 320px;
-    z-index: 10;
-  }
 </style>
