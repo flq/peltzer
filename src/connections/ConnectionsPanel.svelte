@@ -8,7 +8,7 @@
   import Modal from "../components/Modal.svelte";
   import PinModal from "../components/PinModal.svelte";
   import ConnectionForm from "./ConnectionForm.svelte";
-  import {PackagePlus, Lock} from "lucide-svelte";
+  import {PackagePlus, Lock} from "@lucide/svelte";
 
   interface Props {
     onconnect: (config: ConnectionConfig) => void;

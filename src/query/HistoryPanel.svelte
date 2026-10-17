@@ -4,7 +4,7 @@
 </script>
 
 <script lang="ts">
-  import { X } from "lucide-svelte";
+  import { X } from "@lucide/svelte";
   import Button from "../components/Button.svelte";
   import type { HistoryEntry } from "./historyStore";
 

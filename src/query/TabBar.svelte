@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Tab } from "./types";
   import Button from "../components/Button.svelte";
-  import { X } from "lucide-svelte";
+  import { X } from "@lucide/svelte";
 
   interface Props {
     tabs: Tab[];

@@ -1,6 +1,6 @@
 <script lang="ts">
   import Button from "../components/Button.svelte";
-  import { Play, FilePlusCorner, Unplug, FolderOpen, Save, History } from "lucide-svelte";
+  import { Play, FilePlusCorner, Unplug, FolderOpen, Save, History } from "@lucide/svelte";
 
   interface Props {
     disabled?: boolean;
