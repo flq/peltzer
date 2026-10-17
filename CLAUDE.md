@@ -79,6 +79,10 @@ Use this together with the Playwright MCP server (configured in `.mcp.json`) to 
 - Component tests use `@testing-library/svelte` with jsdom
 - Mock Tauri APIs in `src/test/setup.ts`
 - Test files live in `__tests__` subfolder: `src/components/__tests__/Component.test.ts`
+- New features get tests unless they are purely user interactivity (e.g. drag-to-resize)
+
+### Frontend work
+- Invoke the `frontend` skill before creating or editing any Svelte component or CSS — it loads the design tokens and shared components to reuse
 
 ## Supported Databases
 
