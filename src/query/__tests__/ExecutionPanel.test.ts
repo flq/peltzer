@@ -6,6 +6,7 @@ import { queryStore } from "../queryStore";
 import * as api from "../../lib/api";
 import * as fileIo from "../../lib/file-io";
 import * as historyStoreModule from "../historyStore";
+import { EditorView } from "@codemirror/view";
 
 // Mock the API module
 vi.mock("../../lib/api", () => ({
@@ -30,6 +31,19 @@ vi.mock("../historyStore", () => ({
 const defaultProps = {
   onDisconnect: vi.fn(),
 };
+
+function editorView(): EditorView {
+  return EditorView.findFromDOM(screen.getByRole("textbox"))!;
+}
+
+function typeQuery(text: string) {
+  const editor = editorView();
+  editor.dispatch({ changes: { from: 0, to: editor.state.doc.length, insert: text } });
+}
+
+function queryText(): string {
+  return editorView().state.doc.toString();
+}
 
 const mockConnection = { type: "standard" as const, name: "Test", host: "localhost", port: 8182, use_ssl: false };
 
@@ -164,8 +178,8 @@ describe("ExecutionPanel", () => {
 
     render(ExecutionPanel, { props: defaultProps });
 
-    const textarea = screen.getByRole("textbox");
-    await fireEvent.keyDown(textarea, { key: "Enter", ctrlKey: true });
+    const editor = screen.getByRole("textbox");
+    await fireEvent.keyDown(editor, { key: "Enter", ctrlKey: true });
 
     await waitFor(() => {
       expect(api.executeQuery).toHaveBeenCalled();
@@ -201,21 +215,20 @@ describe("ExecutionPanel", () => {
       render(ExecutionPanel, { props: defaultProps });
 
       // Type in first tab
-      const textarea = screen.getByRole("textbox");
-      await fireEvent.input(textarea, { target: { value: "g.V().count()" } });
+      typeQuery("g.V().count()");
 
       // Add second tab
       const newTabButton = screen.getByRole("button", { name: /new tab/i });
       await fireEvent.click(newTabButton);
 
       // Second tab should have default query
-      expect(screen.getByRole("textbox")).toHaveValue("g.V().limit(10)");
+      expect(queryText()).toBe("g.V().limit(10)");
 
       // Switch back to first tab
       await fireEvent.click(screen.getByText("Query 1"));
 
       // First tab should have our custom query
-      expect(screen.getByRole("textbox")).toHaveValue("g.V().count()");
+      expect(queryText()).toBe("g.V().count()");
     });
 
     it("preserves results per tab", async () => {
@@ -320,25 +333,24 @@ describe("ExecutionPanel", () => {
       render(ExecutionPanel, { props: defaultProps });
 
       // Type in first tab
-      const textarea = screen.getByRole("textbox");
-      await fireEvent.input(textarea, { target: { value: "first query" } });
+      typeQuery("first query");
 
       // Add second tab
       await fireEvent.keyDown(window, { key: "t", ctrlKey: true });
 
       // Should be on second tab with default query
-      expect(screen.getByRole("textbox")).toHaveValue("g.V().limit(10)");
+      expect(queryText()).toBe("g.V().limit(10)");
 
       // Press Ctrl+Tab to cycle back to first tab
       await fireEvent.keyDown(window, { key: "Tab", ctrlKey: true });
 
       // Should be back on first tab
-      expect(screen.getByRole("textbox")).toHaveValue("first query");
+      expect(queryText()).toBe("first query");
 
       // Press Ctrl+Tab again to go to second tab
       await fireEvent.keyDown(window, { key: "Tab", ctrlKey: true });
 
-      expect(screen.getByRole("textbox")).toHaveValue("g.V().limit(10)");
+      expect(queryText()).toBe("g.V().limit(10)");
     });
 
     it("switches to previous tab with Ctrl+Shift+Tab", async () => {
@@ -346,27 +358,26 @@ describe("ExecutionPanel", () => {
       render(ExecutionPanel, { props: defaultProps });
 
       // Type in first tab
-      const textarea = screen.getByRole("textbox");
-      await fireEvent.input(textarea, { target: { value: "first query" } });
+      typeQuery("first query");
 
       // Add second tab (now on tab 2)
       await fireEvent.keyDown(window, { key: "t", ctrlKey: true });
 
       // Add third tab (now on tab 3)
       await fireEvent.keyDown(window, { key: "t", ctrlKey: true });
-      await fireEvent.input(screen.getByRole("textbox"), { target: { value: "third query" } });
+      typeQuery("third query");
 
       // Press Ctrl+Shift+Tab to go to previous tab (tab 2)
       await fireEvent.keyDown(window, { key: "Tab", ctrlKey: true, shiftKey: true });
-      expect(screen.getByRole("textbox")).toHaveValue("g.V().limit(10)");
+      expect(queryText()).toBe("g.V().limit(10)");
 
       // Press Ctrl+Shift+Tab again to go to tab 1
       await fireEvent.keyDown(window, { key: "Tab", ctrlKey: true, shiftKey: true });
-      expect(screen.getByRole("textbox")).toHaveValue("first query");
+      expect(queryText()).toBe("first query");
 
       // Press Ctrl+Shift+Tab again to wrap to tab 3
       await fireEvent.keyDown(window, { key: "Tab", ctrlKey: true, shiftKey: true });
-      expect(screen.getByRole("textbox")).toHaveValue("third query");
+      expect(queryText()).toBe("third query");
     });
   });
 
@@ -390,7 +401,7 @@ describe("ExecutionPanel", () => {
 
       await waitFor(() => {
         // New tab should have the file content
-        expect(screen.getByRole("textbox")).toHaveValue("g.V().has('name','Alice')");
+        expect(queryText()).toBe("g.V().has('name','Alice')");
         // Tab bar should show the filename
         expect(screen.getByText("test.gremlin")).toBeInTheDocument();
       });

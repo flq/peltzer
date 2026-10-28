@@ -15,6 +15,10 @@
   --success-color: #10b981;
   --error-color: #f14c4c;
   --warning-color: #cca700;
+  --selection-bg: #264f78;
+  --syntax-string: #ce9178;
+  --syntax-number: #b5cea8;
+  --syntax-atom: #569cd6;
 
 
   --font-size-normal: 14px;
