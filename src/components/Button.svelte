@@ -15,9 +15,15 @@
   let { pending = false, kind = "primary", size = "normal", children, onclick, class: className, ...rest }: Props = $props();
 </script>
 
-<button class="kind-{kind} size-{size} {className ?? ''}" {onclick} {...rest} disabled={pending || rest.disabled}>
+<button
+  class="kind-{kind} size-{size} {className ?? ''}"
+  {onclick}
+  {...rest}
+  disabled={pending || rest.disabled}
+  aria-busy={pending || undefined}
+>
   {#if pending}
-    <span class="spinner"></span>
+    <span class="spinner" aria-hidden="true"></span>
   {/if}
   <span class="content" class:hidden={pending}>
     {@render children()}
@@ -107,8 +113,9 @@
     gap: var(--spacer-05);
   }
 
+  /* Not visibility: hidden, which would also drop the button's accessible name */
   .content.hidden {
-    visibility: hidden;
+    opacity: 0;
   }
 
   .spinner {

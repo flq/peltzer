@@ -15,11 +15,12 @@
 
 <div class="tab-bar">
   {#each tabs as tab, index (tab.id)}
+    {@const label = tab.filePath ? tab.filePath.split(/[\\/]/).pop() : `Query ${index + 1}`}
     <div class="tab" class:active={tab.id === activeTabId}>
       <button class="tab-label" onclick={() => onSelectTab(tab.id)}>
-        {tab.filePath ? tab.filePath.split(/[\\/]/).pop() : `Query ${index + 1}`}
+        {label}
       </button>
-      <Button kind="bare" class="tab-close" onclick={() => onCloseTab(tab.id)} title="Close tab">
+      <Button kind="bare" class="tab-close" onclick={() => onCloseTab(tab.id)} title="Close tab" aria-label="Close {label}">
         <X class="icon-sm" />
       </Button>
     </div>

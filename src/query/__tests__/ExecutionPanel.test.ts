@@ -87,15 +87,15 @@ describe("ExecutionPanel", () => {
     const button = screen.getByRole("button", { name: /execute/i });
     await fireEvent.click(button);
 
-    // Button should be disabled and show spinner while executing
+    // Button should be disabled and busy while executing
     expect(button).toBeDisabled();
-    expect(document.querySelector(".spinner")).toBeInTheDocument();
+    expect(button).toHaveAttribute("aria-busy", "true");
 
     resolveQuery!('["result"]');
 
     await waitFor(() => {
       expect(button).not.toBeDisabled();
-      expect(document.querySelector(".spinner")).not.toBeInTheDocument();
+      expect(button).not.toHaveAttribute("aria-busy");
     });
   });
 
@@ -271,9 +271,7 @@ describe("ExecutionPanel", () => {
       expect(screen.getByText("Query 1")).toBeInTheDocument();
       expect(screen.getByText("Query 2")).toBeInTheDocument();
 
-      // Close second tab (close button)
-      const closeButtons = document.querySelectorAll(".tab-close");
-      await fireEvent.click(closeButtons[1]); // Close Query 2
+      await fireEvent.click(screen.getByRole("button", { name: "Close Query 2" }));
 
       // Tab bar should be hidden (only one tab left)
       expect(screen.queryByText("Query 1")).not.toBeInTheDocument();

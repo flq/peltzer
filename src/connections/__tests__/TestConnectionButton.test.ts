@@ -20,7 +20,7 @@ describe("TestConnectionButton", () => {
     expect(screen.getByRole("button", { name: /test/i })).toBeInTheDocument();
   });
 
-  it("shows spinner while testing", async () => {
+  it("is busy while testing", async () => {
     let resolveTest: (value: string) => void;
     vi.mocked(api.testConnection).mockImplementation(
       () => new Promise((resolve) => { resolveTest = resolve; })
@@ -31,13 +31,13 @@ describe("TestConnectionButton", () => {
     const button = screen.getByRole("button", { name: /test/i });
     await fireEvent.click(button);
 
-    expect(document.querySelector(".spinner")).toBeInTheDocument();
+    expect(button).toHaveAttribute("aria-busy", "true");
     expect(button).toBeDisabled();
 
     resolveTest!("Connection successful");
 
     await waitFor(() => {
-      expect(document.querySelector(".spinner")).not.toBeInTheDocument();
+      expect(button).not.toHaveAttribute("aria-busy");
     });
   });
 

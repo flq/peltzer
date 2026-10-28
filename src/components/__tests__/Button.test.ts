@@ -25,17 +25,15 @@ describe("Button", () => {
     expect(button).toBeDisabled();
   });
 
-  it("shows spinner when pending", () => {
+  it("is marked busy, keeping its name, when pending", () => {
     render(ButtonTestHarness, { props: { pending: true } });
 
-    const spinner = document.querySelector(".spinner");
-    expect(spinner).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /click me/i, busy: true })).toBeInTheDocument();
   });
 
-  it("does not show spinner when not pending", () => {
+  it("is not marked busy when not pending", () => {
     render(ButtonTestHarness, { props: { pending: false } });
 
-    const spinner = document.querySelector(".spinner");
-    expect(spinner).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /click me/i, busy: false })).toBeInTheDocument();
   });
 });
