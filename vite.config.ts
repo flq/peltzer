@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
+import { lezer } from "@lezer/generator/rollup";
 import path from "path";
 
 const host = process.env.TAURI_DEV_HOST;
@@ -7,7 +8,7 @@ const mockTauri = process.env.MOCK_TAURI === "true";
 
 // https://vitejs.dev/config/
 export default defineConfig(async () => ({
-  plugins: [svelte()],
+  plugins: [svelte(), lezer()],
 
   // Vitest configuration
   test: {

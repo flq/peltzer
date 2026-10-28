@@ -1,0 +1,58 @@
+// The subset of Groovy that Gremlin queries use: chains of steps with arguments.
+// Node names are what editor features (movement, selection, completion) navigate by.
+
+@top Query { (expression ";"?)* }
+
+@precedence { member }
+
+expression {
+  Traversal |
+  String |
+  Number |
+  Boolean |
+  Null |
+  List
+}
+
+// g.V().has("name", "x"), T.label, out("knows") inside where(...)
+Traversal { segment (!member "." segment)* }
+
+segment { Step | Identifier }
+
+Step { StepName ArgList }
+
+StepName { identifier }
+
+Identifier { identifier }
+
+ArgList { "(" commaSep<expression> ")" }
+
+List { "[" commaSep<expression> "]" }
+
+Boolean { @specialize<identifier, "true" | "false"> }
+
+Null { @specialize<identifier, "null"> }
+
+commaSep<content> { (content ("," content)*)? }
+
+@skip { space | LineComment }
+
+@tokens {
+  identifier { $[a-zA-Z_$] $[a-zA-Z_$0-9]* }
+
+  String {
+    '"' (!["\\\n] | "\\" _)* '"' |
+    "'" (!['\\\n] | "\\" _)* "'"
+  }
+
+  // Groovy number suffixes like 30L or 1.5d
+  Number { "-"? @digit+ ("." @digit+)? ($[eE] $[+-]? @digit+)? $[lLdDfFiIgG]? }
+
+  LineComment { "//" ![\n]* }
+
+  space { @whitespace+ }
+
+  "(" ")" "[" "]" "," "." ";"
+}
+
+@detectDelim

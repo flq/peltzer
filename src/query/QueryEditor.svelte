@@ -1,13 +1,13 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { EditorState, Prec, type ChangeSpec } from "@codemirror/state";
+  import { EditorState, type ChangeSpec } from "@codemirror/state";
   import { EditorView, keymap, placeholder as placeholderText } from "@codemirror/view";
   import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
   import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
-  import { HighlightStyle, StreamLanguage, syntaxHighlighting } from "@codemirror/language";
-  import { groovy } from "@codemirror/legacy-modes/mode/groovy";
+  import { HighlightStyle, bracketMatching, syntaxHighlighting } from "@codemirror/language";
   import { tags } from "@lezer/highlight";
   import { createTypingAssist, type EditCommand } from "./typingAssist";
+  import { gremlin } from "./gremlinLanguage";
 
   interface Props {
     value: string;
@@ -22,17 +22,11 @@
 
   const typingAssist = createTypingAssist();
 
-  // Gremlin rarely needs Groovy's [, { or ' pairs, so only pair what we actually type a lot
-  const bracketPairs = Prec.highest(
-    EditorState.languageData.of(() => [{ closeBrackets: { brackets: ["(", '"'] } }])
-  );
-
   const valueHighlighting = syntaxHighlighting(
     HighlightStyle.define([
       { tag: tags.string, color: "var(--syntax-string)" },
       { tag: tags.number, color: "var(--syntax-number)" },
-      // true, false, null
-      { tag: tags.atom, color: "var(--syntax-atom)" },
+      { tag: [tags.bool, tags.null], color: "var(--syntax-atom)" },
     ])
   );
 
@@ -106,7 +100,6 @@
         extensions: [
           history(),
           closeBrackets(),
-          bracketPairs,
           assistHandlers,
           keymap.of([
             ...closeBracketsKeymap,
@@ -114,7 +107,8 @@
             ...defaultKeymap.filter((binding) => binding.key !== "Mod-Enter"),
             ...historyKeymap,
           ]),
-          StreamLanguage.define(groovy),
+          gremlin(),
+          bracketMatching(),
           valueHighlighting,
           placeholderText(placeholder),
           EditorView.lineWrapping,
