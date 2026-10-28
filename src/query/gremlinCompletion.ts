@@ -35,8 +35,9 @@ function optionsFor(
   if (before.endsWith(".")) {
     const receiver = /([\w$]+|\))\s*\.$/.exec(before)?.[1];
     if (receiver === "g") return sourceOptions;
-    // T.label, P.gt, Order.desc: enum and class members, not steps
-    if (receiver && /^[A-Z]/.test(receiver)) return null;
+    // T.label, P.gt, Order.desc: enum and class members, not steps.
+    // A digit means a decimal number like 0.5
+    if (receiver && /^[A-Z0-9]/.test(receiver)) return null;
     return stepOptions;
   }
 

@@ -53,6 +53,10 @@ describe("gremlin step completion", () => {
     expect(labels("g.V().order().by(Order.|")).toBeNull();
   });
 
+  it("does not offer anything after a number's decimal point", () => {
+    expect(labels('g.V().has("weight", 0.|')).toBeNull();
+  });
+
   it("does not offer anything inside strings", () => {
     expect(labels('g.V().has("na.|")')).toBeNull();
   });

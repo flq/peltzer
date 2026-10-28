@@ -3,7 +3,7 @@
   import { EditorState, type ChangeSpec } from "@codemirror/state";
   import { EditorView, keymap, placeholder as placeholderText } from "@codemirror/view";
   import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
-  import { autocompletion, closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
+  import { acceptCompletion, autocompletion, closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
   import { HighlightStyle, bracketMatching, syntaxHighlighting } from "@codemirror/language";
   import { tags } from "@lezer/highlight";
   import { createTypingAssist, type EditCommand } from "./typingAssist";
@@ -22,6 +22,10 @@
   let view = $state.raw<EditorView>();
 
   const typingAssist = createTypingAssist();
+
+  // ExecutionPanel uses Ctrl or Cmd with Enter, H, O and T. On macOS CodeMirror binds
+  // Ctrl-h/o/t to Emacs-style edits, which would fire alongside the app shortcut.
+  const APP_SHORTCUTS_MAC = new Set(["Ctrl-h", "Ctrl-o", "Ctrl-t"]);
 
   const valueHighlighting = syntaxHighlighting(
     HighlightStyle.define([
@@ -128,9 +132,12 @@
           }),
           assistHandlers,
           keymap.of([
+            // Only while the completion list is open; otherwise Tab still moves focus
+            { key: "Tab", run: acceptCompletion },
             ...closeBracketsKeymap,
-            // Mod-Enter executes the query (handled by ExecutionPanel)
-            ...defaultKeymap.filter((binding) => binding.key !== "Mod-Enter"),
+            ...defaultKeymap.filter(
+              (binding) => binding.key !== "Mod-Enter" && !APP_SHORTCUTS_MAC.has(binding.mac ?? "")
+            ),
             ...historyKeymap,
           ]),
           gremlin(),
