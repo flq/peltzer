@@ -2,7 +2,8 @@
 
 ## To Do
 - [ ] React to selection and execute only the selected part.
-- [ ] In query & results pane, clicking into a valxue in quotes selects the whole value, ready for copying
+- [ ] In the results pane, clicking into a value in quotes selects the whole value, ready for copying
+- [ ] Step snippets in autocompletion: completing e.g. has offers forms like has("key"), has("key", value), has("label", "key", value) with Tab/Shift+Tab between fields. Also hasLabel, hasId, out/in/both(E) with label, values, valueMap, property, limit, range, skip, tail, addV, addE, as, select
 
 ## Done
 
