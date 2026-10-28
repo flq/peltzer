@@ -26,9 +26,16 @@
   let pinPending = $state(false);
   let pendingAction = $state<{ type: "save" | "connect" | "edit"; config: ConnectionConfig } | null>(null);
 
+  // Until the saved connections have loaded, show nothing rather than a brief "No saved connections"
+  let loaded = $state(false);
+
   onMount(async () => {
-    const connections = await getSavedConnections();
-    savedConnections.set(connections);
+    try {
+      const connections = await getSavedConnections();
+      savedConnections.set(connections);
+    } finally {
+      loaded = true;
+    }
   });
 
   async function handleConnect(config: ConnectionConfig) {
@@ -126,35 +133,37 @@
   <div class="panel-container u-flex-column">
     <h1>Connections</h1>
 
-    {#if $savedConnections.length > 0}
-      <div class="connection-list u-flex-column">
-        {#each $savedConnections as conn (conn.name)}
-          <div class="connection-item">
-            <Button kind="bare" class="connection-name" onclick={() => handleConnect(conn)}>
-              <span class="connection-name-row">
-                {conn.name}
-                {#if conn.secure_storage}
-                  <Lock class="icon-sm lock-icon" aria-label="Secure connection" />
-                {/if}
-              </span>
-              <span class="connection-host">
-                {getName(conn)}
-              </span>
-            </Button>
-            <div class="connection-actions">
-              <Button kind="secondary" onclick={() => handleEdit(conn)}>Edit</Button>
-              <Button kind="secondary" onclick={() => handleDelete(conn)}>Delete</Button>
+    {#if loaded || $savedConnections.length > 0}
+      {#if $savedConnections.length > 0}
+        <div class="connection-list u-flex-column">
+          {#each $savedConnections as conn (conn.name)}
+            <div class="connection-item">
+              <Button kind="bare" class="connection-name" onclick={() => handleConnect(conn)}>
+                <span class="connection-name-row">
+                  {conn.name}
+                  {#if conn.secure_storage}
+                    <Lock class="icon-sm lock-icon" aria-label="Secure connection" />
+                  {/if}
+                </span>
+                <span class="connection-host">
+                  {getName(conn)}
+                </span>
+              </Button>
+              <div class="connection-actions">
+                <Button kind="secondary" onclick={() => handleEdit(conn)}>Edit</Button>
+                <Button kind="secondary" onclick={() => handleDelete(conn)}>Delete</Button>
+              </div>
             </div>
-          </div>
-        {/each}
-      </div>
-    {:else}
-      <p class="no-connections">No saved connections</p>
-    {/if}
+          {/each}
+        </div>
+      {:else}
+        <p class="no-connections">No saved connections</p>
+      {/if}
 
-    <Button onclick={() => handleEdit(null)}>
-      <PackagePlus class="icon-md" /> New Connection
-    </Button>
+      <Button onclick={() => handleEdit(null)}>
+        <PackagePlus class="icon-md" /> New Connection
+      </Button>
+    {/if}
   </div>
 </div>
 

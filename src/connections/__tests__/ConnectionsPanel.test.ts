@@ -53,14 +53,23 @@ describe("ConnectionsPanel", () => {
     render(ConnectionsPanel, { props: { onconnect } });
 
     expect(screen.getByText("Connections")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /new connection/i })).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: /new connection/i })).toBeInTheDocument();
   });
 
   it("shows 'No saved connections' when list is empty", async () => {
     const onconnect = vi.fn();
     render(ConnectionsPanel, { props: { onconnect } });
 
-    expect(screen.getByText("No saved connections")).toBeInTheDocument();
+    expect(await screen.findByText("No saved connections")).toBeInTheDocument();
+  });
+
+  it("shows neither the empty state nor the add button while connections are loading", async () => {
+    vi.mocked(api.getSavedConnections).mockReturnValue(new Promise(() => {}));
+    render(ConnectionsPanel, { props: { onconnect: vi.fn() } });
+
+    expect(screen.getByText("Connections")).toBeInTheDocument();
+    expect(screen.queryByText("No saved connections")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /new connection/i })).not.toBeInTheDocument();
   });
 
   it("displays saved connections from store", async () => {
@@ -87,7 +96,7 @@ describe("ConnectionsPanel", () => {
     const onconnect = vi.fn();
     render(ConnectionsPanel, { props: { onconnect } });
 
-    const addButton = screen.getByRole("button", { name: /new connection/i });
+    const addButton = await screen.findByRole("button", { name: /new connection/i });
     await fireEvent.click(addButton);
 
     expect(screen.getByRole("heading", { name: "New Connection" })).toBeInTheDocument();
@@ -104,7 +113,7 @@ describe("ConnectionsPanel", () => {
     render(ConnectionsPanel, { props: { onconnect } });
 
     // Open modal
-    const addButton = screen.getByRole("button", { name: /new connection/i });
+    const addButton = await screen.findByRole("button", { name: /new connection/i });
     await fireEvent.click(addButton);
 
     // Select Standard connection type
@@ -137,7 +146,7 @@ describe("ConnectionsPanel", () => {
     render(ConnectionsPanel, { props: { onconnect } });
 
     // Open modal
-    const addButton = screen.getByRole("button", { name: /new connection/i });
+    const addButton = await screen.findByRole("button", { name: /new connection/i });
     await fireEvent.click(addButton);
 
     // Select Cosmos DB connection type
@@ -219,7 +228,7 @@ describe("ConnectionsPanel", () => {
     render(ConnectionsPanel, { props: { onconnect } });
 
     // Open modal
-    const addButton = screen.getByRole("button", { name: /new connection/i });
+    const addButton = await screen.findByRole("button", { name: /new connection/i });
     await fireEvent.click(addButton);
 
     // Select Standard type
