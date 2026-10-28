@@ -52,6 +52,11 @@ describe("typingAssist", () => {
     expect(assist.handleKey(key(".", { nextChar: ")" }))).toBeNull();
   });
 
+  it("moves a dot behind ) after parens were opened by a completion", () => {
+    assist.parenOpened();
+    expect(assist.handleKey(key(".", { nextChar: ")" }))).not.toBeNull();
+  });
+
   it("lets ordinary characters through", () => {
     expect(assist.handleKey(key("g"))).toBeNull();
   });

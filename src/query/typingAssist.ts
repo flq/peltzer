@@ -35,5 +35,10 @@ export function createTypingAssist() {
     justOpenedParen = false;
   }
 
-  return { handleKey, reset };
+  // For parens opened by something other than a keystroke, e.g. a completion
+  function parenOpened() {
+    justOpenedParen = true;
+  }
+
+  return { handleKey, reset, parenOpened };
 }

@@ -3,11 +3,12 @@
   import { EditorState, type ChangeSpec } from "@codemirror/state";
   import { EditorView, keymap, placeholder as placeholderText } from "@codemirror/view";
   import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
-  import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
+  import { autocompletion, closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
   import { HighlightStyle, bracketMatching, syntaxHighlighting } from "@codemirror/language";
   import { tags } from "@lezer/highlight";
   import { createTypingAssist, type EditCommand } from "./typingAssist";
   import { gremlin } from "./gremlinLanguage";
+  import { gremlinStepCompletion } from "./gremlinCompletion";
 
   interface Props {
     value: string;
@@ -53,6 +54,18 @@
         color: "var(--error-color)",
         outline: "1px solid var(--error-color)",
       },
+      ".cm-tooltip": {
+        backgroundColor: "var(--bg-secondary)",
+        border: "1px solid var(--border-color)",
+        borderRadius: "var(--border-radius)",
+        overflow: "hidden",
+      },
+      ".cm-tooltip.cm-tooltip-autocomplete > ul": { fontFamily: "inherit", maxHeight: "16em" },
+      ".cm-tooltip.cm-tooltip-autocomplete > ul > li": { padding: "var(--spacer-025) var(--spacer-05)" },
+      ".cm-tooltip-autocomplete ul li[aria-selected]": { backgroundColor: "var(--accent)", color: "white" },
+      ".cm-completionMatchedText": { textDecoration: "none", fontWeight: "bold" },
+      ".cm-completionDetail": { color: "var(--text-secondary)", fontStyle: "normal", marginLeft: "var(--spacer-1)" },
+      "li[aria-selected] .cm-completionDetail": { color: "inherit" },
       "&.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground, .cm-selectionBackground":
         { backgroundColor: "var(--selection-bg)" },
     },
@@ -109,6 +122,10 @@
         extensions: [
           history(),
           closeBrackets(),
+          autocompletion({
+            override: [gremlinStepCompletion(() => typingAssist.parenOpened())],
+            icons: false,
+          }),
           assistHandlers,
           keymap.of([
             ...closeBracketsKeymap,
