@@ -74,6 +74,10 @@
     padding: var(--spacer-1);
     background-color: var(--bg-primary);
     color: var(--text-primary);
+    /* <pre> otherwise gets the browser's generic monospace instead of the app font */
+    font-family: inherit;
+    font-size: var(--font-size-normal);
+    line-height: var(--line-height-code);
     overflow: auto;
     white-space: pre-wrap;
     word-break: break-word;

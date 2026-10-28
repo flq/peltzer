@@ -22,8 +22,9 @@
   --syntax-atom: #569cd6;
 
 
-  --font-size-normal: 14px;
-  --font-size-large: calc(var(--font-size-normal) * 1.75);
+  --font-size-normal: 16px;
+  --line-height-code: 1.6;
+  --font-size-large: calc(var(--font-size-normal) * 1.5);
 
   --icon-size-sm: 12px;
   --icon-size-md: 16px;

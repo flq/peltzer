@@ -58,7 +58,7 @@
     border: none;
     padding: var(--spacer-025) var(--spacer-05);
     color: var(--text-primary);
-    font-size: var(--font-size-small);
+    font-size: inherit;
     cursor: pointer;
   }
 

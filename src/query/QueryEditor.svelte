@@ -39,7 +39,7 @@
         fontSize: "var(--font-size-normal)",
       },
       "&.cm-focused": { outline: "none" },
-      ".cm-scroller": { fontFamily: "inherit", lineHeight: "1.6" },
+      ".cm-scroller": { fontFamily: "inherit", lineHeight: "var(--line-height-code)" },
       ".cm-content": { padding: "var(--spacer-1)", caretColor: "var(--text-primary)" },
       ".cm-line": { padding: "0" },
       ".cm-cursor": { borderLeftColor: "var(--text-primary)" },
