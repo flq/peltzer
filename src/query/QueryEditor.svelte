@@ -44,6 +44,15 @@
       ".cm-line": { padding: "0" },
       ".cm-cursor": { borderLeftColor: "var(--text-primary)" },
       ".cm-placeholder": { color: "var(--text-secondary)" },
+      "&.cm-focused .cm-matchingBracket": {
+        backgroundColor: "var(--bracket-match-bg)",
+        outline: "1px solid var(--text-secondary)",
+      },
+      "&.cm-focused .cm-nonmatchingBracket": {
+        backgroundColor: "transparent",
+        color: "var(--error-color)",
+        outline: "1px solid var(--error-color)",
+      },
       "&.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground, .cm-selectionBackground":
         { backgroundColor: "var(--selection-bg)" },
     },
