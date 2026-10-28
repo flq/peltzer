@@ -30,6 +30,7 @@
   import HistoryPanel from "./HistoryPanel.svelte";
   import { isConnected } from "../lib/stores";
   import { executeQuery } from "../lib/api";
+  import { errorMessage } from "../lib/errors";
   import { queryStore } from "./queryStore";
   import { historyStore } from "./historyStore";
 
@@ -77,7 +78,7 @@
         historyStore.add(query);
       })
       .catch((e) => {
-        queryStore.setResult(tabId, `Error: ${e}`, "");
+        queryStore.setResult(tabId, `Error: ${errorMessage(e)}`, "");
       });
   }
 

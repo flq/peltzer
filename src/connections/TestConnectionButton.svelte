@@ -1,5 +1,6 @@
 <script lang="ts">
   import { testConnection } from "../lib/api";
+  import { errorMessage } from "../lib/errors";
   import type { ConnectionConfig } from "../lib/types";
   import Button from "../components/Button.svelte";
 
@@ -20,7 +21,7 @@
       const result = await testConnection(config);
       onsuccess?.(result);
     } catch (e) {
-      onerror?.(`${e}`);
+      onerror?.(errorMessage(e));
     } finally {
       testing = false;
     }

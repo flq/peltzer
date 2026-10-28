@@ -39,7 +39,7 @@
     }
   });
 
-  async function handleConnect(config: ConnectionConfig) {
+  function handleConnect(config: ConnectionConfig) {
     if (config.secure_storage) {
       pendingAction = { type: "connect", config };
       pinModalTitle = `Enter PIN for "${config.name}"`;

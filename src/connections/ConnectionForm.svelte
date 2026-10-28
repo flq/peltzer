@@ -1,5 +1,6 @@
 <script lang="ts">
     import type {ConnectionConfig} from "../lib/types";
+    import {errorMessage} from "../lib/errors";
     import Button from "../components/Button.svelte";
     import StatusMessage from "../components/StatusMessage.svelte";
     import TestConnectionButton from "./TestConnectionButton.svelte";
@@ -14,15 +15,11 @@
     let {defaultConfig = null, onSave}: Props = $props();
 
     let saving = $state(false);
-    let selectedType = $state<"standard" | "cosmos" | null>(null);
+    // Resets when defaultConfig changes (e.g. opening the edit modal), but the type buttons can override it
+    let selectedType = $derived<"standard" | "cosmos" | null>(defaultConfig?.type ?? null);
     let currentConfig = $state<ConnectionConfig | null>(null);
-    let testError = $state<string | null>(null);
-    let testSuccess = $state<string | null>(null);
-
-    // Update selectedType when editConfig changes (e.g., when opening edit modal)
-    $effect(() => {
-        selectedType = defaultConfig?.type ?? null;
-    });
+    let statusError = $state<string | null>(null);
+    let statusSuccess = $state<string | null>(null);
 
     function selectType(type: "standard" | "cosmos") {
         selectedType = type;
@@ -30,25 +27,29 @@
 
     function handleConfigChange(config: ConnectionConfig) {
         currentConfig = config;
-        testError = null;
-        testSuccess = null;
+        statusError = null;
+        statusSuccess = null;
     }
 
     function handleTestSuccess(message: string) {
-        testSuccess = message;
-        testError = null;
+        statusSuccess = message;
+        statusError = null;
     }
 
     function handleTestError(error: string | null) {
-        testError = error;
-        testSuccess = null;
+        statusError = error;
+        statusSuccess = null;
     }
 
     async function handleSave() {
         if (!currentConfig) return;
         saving = true;
+        statusError = null;
+        statusSuccess = null;
         try {
             await onSave?.(currentConfig);
+        } catch (e) {
+            statusError = `Failed to save connection: ${errorMessage(e)}`;
         } finally {
             saving = false;
         }
@@ -64,7 +65,7 @@
         </div>
     </div>
 {:else}
-    <form class="connection-form u-flex-column" onsubmit={(e) => { e.preventDefault(); handleSave(); }}>
+    <form class="connection-form u-flex-column" onsubmit={(e) => { e.preventDefault(); void handleSave(); }}>
         {#if selectedType === "standard"}
             <StandardConnectionFields
                     initial={defaultConfig?.type === "standard" ? defaultConfig : null}
@@ -78,10 +79,10 @@
         {/if}
 
         <div class="actions u-flex-column">
-            {#if testSuccess}
-                <StatusMessage type="success" message={testSuccess} />
-            {:else if testError}
-                <StatusMessage type="error" message={testError} />
+            {#if statusSuccess}
+                <StatusMessage type="success" message={statusSuccess} />
+            {:else if statusError}
+                <StatusMessage type="error" message={statusError} />
             {/if}
             <div class="form-actions">
                 <TestConnectionButton config={currentConfig} onsuccess={handleTestSuccess} onerror={handleTestError}/>

@@ -88,7 +88,7 @@
     {#if entries.length === 0}
       <p class="empty-state">No history yet</p>
     {:else}
-      {#each entries as entry}
+      {#each entries as entry (entry.query)}
         <button class="history-entry" title={entry.query} onclick={() => handleSelect(entry.query)}>
           <span class="entry-text">{entry.query}</span>
         </button>

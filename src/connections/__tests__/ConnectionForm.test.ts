@@ -59,4 +59,20 @@ describe("ConnectionForm", () => {
       expect(screen.getByLabelText(/secure storage/i)).toBeInTheDocument();
     });
   });
+
+  it("shows an inline error and re-enables Save when saving fails", async () => {
+    const onSave = vi.fn().mockRejectedValue("Store is read-only");
+
+    render(ConnectionForm, { props: { onSave } });
+
+    await fireEvent.click(screen.getByRole("button", { name: "Standard" }));
+    await fireEvent.input(screen.getByLabelText("Name"), { target: { value: "Test" } });
+    await fireEvent.input(screen.getByLabelText("Host"), { target: { value: "localhost" } });
+    await fireEvent.click(screen.getByRole("button", { name: /save/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText("Failed to save connection: Store is read-only")).toBeInTheDocument();
+    });
+    expect(screen.getByRole("button", { name: /save/i })).not.toBeDisabled();
+  });
 });

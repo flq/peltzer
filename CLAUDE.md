@@ -42,6 +42,7 @@ A Tauri desktop application for connecting to and querying Gremlin graph databas
 npm run tauri dev      # Development with hot reload
 npm run build          # Frontend build
 npm test               # Frontend tests
+npm run lint           # ESLint (type-aware)
 cd src-tauri && cargo build   # Backend build
 cd src-tauri && cargo test    # Backend tests
 ```

@@ -6,6 +6,7 @@
   import { activeConnection, isConnected } from "./lib/stores";
   import { connect, disconnect } from "./lib/api";
   import { toast } from "./lib/toastStore";
+  import { errorMessage } from "./lib/errors";
   import { historyStore } from "./query/historyStore";
   import { getCurrentWindow } from "@tauri-apps/api/window";
   import type { ConnectionConfig } from "./lib/types";
@@ -13,7 +14,8 @@
   onMount(async () => {
     await historyStore.load();
     window.addEventListener("beforeunload", () => {
-      historyStore.persist();
+      // beforeunload can't await, so this save is best-effort
+      void historyStore.persist();
     });
   });
 
@@ -22,7 +24,7 @@
       await connect(config);
       activeConnection.set(config);
     } catch (e) {
-      toast(`Connection error: ${e}`, "error");
+      toast(`Connection error: ${errorMessage(e)}`, "error");
       activeConnection.set(null);
       return;
     }
@@ -34,7 +36,7 @@
       await disconnect();
       activeConnection.set(null);
     } catch (e) {
-      toast(`Disconnect error: ${e}`, "error");
+      toast(`Disconnect error: ${errorMessage(e)}`, "error");
       return;
     }
     await historyStore.persist();

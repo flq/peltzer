@@ -1,10 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 import { Store } from "@tauri-apps/plugin-store";
-import type {
-  ConnectionConfig,
-  StandardConnectionConfig,
-  CosmosConnectionConfig,
-} from "./types";
+import type { ConnectionConfig, CosmosConnectionConfig } from "./types";
 
 interface Credentials {
   username?: string;
@@ -29,7 +25,7 @@ function extractSensitiveFields(config: ConnectionConfig): {
   if (config.type === "standard") {
     const { username, password, ...rest } = config;
     return {
-      sanitized: { ...rest, type: "standard" } as StandardConnectionConfig,
+      sanitized: { ...rest, type: "standard" },
       credentials: { username, password },
     };
   } else {

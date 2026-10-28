@@ -11,6 +11,7 @@
   import { queryStore } from "./queryStore";
   import { openQueryFile, saveQueryToFile } from "../lib/file-io";
   import { toast } from "../lib/toastStore";
+  import { errorMessage } from "../lib/errors";
 
   interface Props {
     onStateChange?: (state: TabContainerState) => void;
@@ -85,7 +86,7 @@
       tabs = [...tabs, newTab];
       activeTabId = newTab.id;
     } catch (e) {
-      toast(`Failed to open file: ${e}`, "error");
+      toast(`Failed to open file: ${errorMessage(e)}`, "error");
     }
   }
 
@@ -97,7 +98,7 @@
         activeTab.filePath = savedPath;
       }
     } catch (e) {
-      toast(`Failed to save file: ${e}`, "error");
+      toast(`Failed to save file: ${errorMessage(e)}`, "error");
     }
   }
 

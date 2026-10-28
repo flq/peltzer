@@ -4,18 +4,10 @@ use tokio::sync::Mutex;
 
 use crate::connection_config::ConnectionConfig;
 
+#[derive(Default)]
 pub struct ConnectionState {
     pub client: Option<GremlinClient>,
     pub config: Option<ConnectionConfig>,
-}
-
-impl Default for ConnectionState {
-    fn default() -> Self {
-        Self {
-            client: None,
-            config: None,
-        }
-    }
 }
 
 pub type SharedConnectionState = Arc<Mutex<ConnectionState>>;

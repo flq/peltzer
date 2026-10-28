@@ -177,7 +177,8 @@ mod tests {
 
     #[test]
     fn secure_storage_defaults_to_false_when_missing() {
-        let json = r#"{"type":"standard","name":"Test","host":"localhost","port":8182,"use_ssl":false}"#;
+        let json =
+            r#"{"type":"standard","name":"Test","host":"localhost","port":8182,"use_ssl":false}"#;
         let config: ConnectionConfig = serde_json::from_str(json).unwrap();
         match config {
             ConnectionConfig::Standard { secure_storage, .. } => {

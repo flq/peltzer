@@ -13,7 +13,8 @@
     "test:watch": "vitest",
     "tauri": "tauri",
     "db:start": "docker compose up -d",
-    "db:stop": "docker compose stop"
+    "db:stop": "docker compose stop",
+    "lint": "eslint ."
   },
   "dependencies": {
     "@codemirror/autocomplete": "^6.20.4",
@@ -31,16 +32,21 @@
     "@tauri-apps/plugin-store": "^2"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@lezer/generator": "^1.8.1",
     "@sveltejs/vite-plugin-svelte": "^7",
     "@tauri-apps/cli": "^2",
     "@testing-library/jest-dom": "^7",
     "@testing-library/svelte": "^5",
     "@types/node": "^26",
+    "eslint": "^10.13.0",
+    "eslint-plugin-svelte": "^3.23.1",
+    "globals": "^17.13.0",
     "jsdom": "^29",
     "svelte": "^5",
     "svelte-check": "^4",
     "typescript": "^6",
+    "typescript-eslint": "^8.72.1",
     "vite": "^8",
     "vitest": "^5"
   }

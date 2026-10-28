@@ -10,11 +10,13 @@ Run the following verification steps in sequence. Stop and report if any step fa
 
 ```bash
 npm run check
+npm run lint
 npm run build
 ```
 
-`npm run check` runs svelte-check, which type-checks all `.ts` and `.svelte` files (including tests). `npm run build` only bundles: Vite strips types without checking them, so a passing build says nothing about type errors. Check for:
+`npm run check` runs svelte-check, which type-checks all `.ts` and `.svelte` files (including tests). `npm run lint` runs ESLint with type-aware rules (floating promises, unsafe `any` flow, Svelte rune misuse). `npm run build` only bundles: Vite strips types without checking them, so a passing build says nothing about type errors. Check for:
 - Type errors and svelte-check warnings (treat both as failures)
+- ESLint errors
 - Import/export issues
 - Missing dependencies
 
@@ -22,12 +24,16 @@ npm run build
 
 ```bash
 cargo build --manifest-path src-tauri/Cargo.toml
+cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings
+cargo fmt --manifest-path src-tauri/Cargo.toml --check
 ```
 
-This compiles the Rust backend. Check for:
+This compiles and lints the Rust backend. Check for:
 - Compilation errors
 - Borrow checker issues
 - Missing dependencies
+- Clippy warnings (treated as errors)
+- Formatting drift (fix with `cargo fmt --manifest-path src-tauri/Cargo.toml`)
 
 ## Step 3: Frontend Tests
 

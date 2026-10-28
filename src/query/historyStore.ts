@@ -33,7 +33,7 @@ function createHistoryStore() {
       });
       const current = get(self);
       if (current.length > 0 && current.length % 5 === 0) {
-        self.persist();
+        self.persist().catch((e) => console.error("Failed to persist query history", e));
       }
     },
 
