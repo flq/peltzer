@@ -52,8 +52,8 @@ describe("ConnectionsPanel", () => {
     const onconnect = vi.fn();
     render(ConnectionsPanel, { props: { onconnect } });
 
-    expect(screen.getByText("Connections")).toBeInTheDocument();
-    expect(await screen.findByRole("button", { name: /new connection/i })).toBeInTheDocument();
+    expect(await screen.findByText("Connections")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /new connection/i })).toBeInTheDocument();
   });
 
   it("shows 'No saved connections' when list is empty", async () => {
@@ -63,11 +63,11 @@ describe("ConnectionsPanel", () => {
     expect(await screen.findByText("No saved connections")).toBeInTheDocument();
   });
 
-  it("shows neither the empty state nor the add button while connections are loading", async () => {
+  it("shows nothing while connections are loading", async () => {
     vi.mocked(api.getSavedConnections).mockReturnValue(new Promise(() => {}));
     render(ConnectionsPanel, { props: { onconnect: vi.fn() } });
 
-    expect(screen.getByText("Connections")).toBeInTheDocument();
+    expect(screen.queryByText("Connections")).not.toBeInTheDocument();
     expect(screen.queryByText("No saved connections")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /new connection/i })).not.toBeInTheDocument();
   });

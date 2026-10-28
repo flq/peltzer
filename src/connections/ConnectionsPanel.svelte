@@ -26,7 +26,8 @@
   let pinPending = $state(false);
   let pendingAction = $state<{ type: "save" | "connect" | "edit"; config: ConnectionConfig } | null>(null);
 
-  // Until the saved connections have loaded, show nothing rather than a brief "No saved connections"
+  // Show nothing until the saved connections have loaded: the panel is centred vertically,
+  // so partial content (heading alone, or "No saved connections") would jump when the list arrives
   let loaded = $state(false);
 
   onMount(async () => {
@@ -130,10 +131,10 @@
 </script>
 
 <div class="connections-panel">
-  <div class="panel-container u-flex-column">
-    <h1>Connections</h1>
+  {#if loaded || $savedConnections.length > 0}
+    <div class="panel-container u-flex-column">
+      <h1>Connections</h1>
 
-    {#if loaded || $savedConnections.length > 0}
       {#if $savedConnections.length > 0}
         <div class="connection-list u-flex-column">
           {#each $savedConnections as conn (conn.name)}
@@ -163,8 +164,8 @@
       <Button onclick={() => handleEdit(null)}>
         <PackagePlus class="icon-md" /> New Connection
       </Button>
-    {/if}
-  </div>
+    </div>
+  {/if}
 </div>
 
 <Modal open={showModal} title={editingConnection ? "Edit Connection" : "New Connection"} onclose={handleModalClose}>
