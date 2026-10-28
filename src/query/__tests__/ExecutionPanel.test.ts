@@ -6,7 +6,7 @@ import { queryStore } from "../queryStore";
 import * as api from "../../lib/api";
 import * as fileIo from "../../lib/file-io";
 import * as historyStoreModule from "../historyStore";
-import { EditorView } from "@codemirror/view";
+import { editorView } from "../../test/editor";
 
 // Mock the API module
 vi.mock("../../lib/api", () => ({
@@ -31,10 +31,6 @@ vi.mock("../historyStore", () => ({
 const defaultProps = {
   onDisconnect: vi.fn(),
 };
-
-function editorView(): EditorView {
-  return EditorView.findFromDOM(screen.getByRole("textbox"))!;
-}
 
 function typeQuery(text: string) {
   const editor = editorView();
@@ -86,6 +82,7 @@ describe("ExecutionPanel", () => {
     );
 
     render(ExecutionPanel, { props: defaultProps });
+    typeQuery("g.V().limit(10)");
 
     const button = screen.getByRole("button", { name: /execute/i });
     await fireEvent.click(button);
@@ -113,6 +110,7 @@ describe("ExecutionPanel", () => {
     vi.mocked(api.executeQuery).mockResolvedValue(mockResult);
 
     render(ExecutionPanel, { props: defaultProps });
+    typeQuery("g.V().limit(10)");
 
     const button = screen.getByRole("button", { name: /execute/i });
     await fireEvent.click(button);
@@ -129,6 +127,7 @@ describe("ExecutionPanel", () => {
     vi.mocked(api.executeQuery).mockRejectedValue(new Error("Connection refused"));
 
     render(ExecutionPanel, { props: defaultProps });
+    typeQuery("g.V().limit(10)");
 
     const button = screen.getByRole("button", { name: /execute/i });
     await fireEvent.click(button);
@@ -144,6 +143,7 @@ describe("ExecutionPanel", () => {
     vi.mocked(api.executeQuery).mockResolvedValue("plain text result");
 
     render(ExecutionPanel, { props: defaultProps });
+    typeQuery("g.V().limit(10)");
 
     const button = screen.getByRole("button", { name: /execute/i });
     await fireEvent.click(button);
@@ -177,6 +177,7 @@ describe("ExecutionPanel", () => {
     vi.mocked(api.executeQuery).mockResolvedValue("[]");
 
     render(ExecutionPanel, { props: defaultProps });
+    typeQuery("g.V().limit(10)");
 
     const editor = screen.getByRole("textbox");
     await fireEvent.keyDown(editor, { key: "Enter", ctrlKey: true });
@@ -221,8 +222,8 @@ describe("ExecutionPanel", () => {
       const newTabButton = screen.getByRole("button", { name: /new tab/i });
       await fireEvent.click(newTabButton);
 
-      // Second tab should have default query
-      expect(queryText()).toBe("g.V().limit(10)");
+      // Second tab should start empty
+      expect(queryText()).toBe("");
 
       // Switch back to first tab
       await fireEvent.click(screen.getByText("Query 1"));
@@ -236,6 +237,7 @@ describe("ExecutionPanel", () => {
       vi.mocked(api.executeQuery).mockResolvedValue('["first tab result"]');
 
       render(ExecutionPanel, { props: defaultProps });
+      typeQuery("g.V().limit(10)");
 
       // Execute in first tab
       const executeButton = screen.getByRole("button", { name: /execute/i });
@@ -338,8 +340,8 @@ describe("ExecutionPanel", () => {
       // Add second tab
       await fireEvent.keyDown(window, { key: "t", ctrlKey: true });
 
-      // Should be on second tab with default query
-      expect(queryText()).toBe("g.V().limit(10)");
+      // Should be on second tab, which starts empty
+      expect(queryText()).toBe("");
 
       // Press Ctrl+Tab to cycle back to first tab
       await fireEvent.keyDown(window, { key: "Tab", ctrlKey: true });
@@ -350,7 +352,7 @@ describe("ExecutionPanel", () => {
       // Press Ctrl+Tab again to go to second tab
       await fireEvent.keyDown(window, { key: "Tab", ctrlKey: true });
 
-      expect(queryText()).toBe("g.V().limit(10)");
+      expect(queryText()).toBe("");
     });
 
     it("switches to previous tab with Ctrl+Shift+Tab", async () => {
@@ -369,7 +371,7 @@ describe("ExecutionPanel", () => {
 
       // Press Ctrl+Shift+Tab to go to previous tab (tab 2)
       await fireEvent.keyDown(window, { key: "Tab", ctrlKey: true, shiftKey: true });
-      expect(queryText()).toBe("g.V().limit(10)");
+      expect(queryText()).toBe("");
 
       // Press Ctrl+Shift+Tab again to go to tab 1
       await fireEvent.keyDown(window, { key: "Tab", ctrlKey: true, shiftKey: true });
@@ -411,6 +413,7 @@ describe("ExecutionPanel", () => {
       vi.mocked(fileIo.saveQueryToFile).mockResolvedValue("/tmp/saved.gremlin");
 
       render(ExecutionPanel, { props: defaultProps });
+      typeQuery("g.V().limit(10)");
 
       await fireEvent.keyDown(window, { key: "s", metaKey: true });
 
@@ -477,6 +480,7 @@ describe("ExecutionPanel", () => {
       vi.mocked(api.executeQuery).mockResolvedValue('["result"]');
 
       render(ExecutionPanel, { props: defaultProps });
+      typeQuery("g.V().limit(10)");
 
       await fireEvent.click(screen.getByRole("button", { name: /execute/i }));
 

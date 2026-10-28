@@ -2,14 +2,12 @@ import { describe, it, expect, vi } from "vitest";
 import { render, fireEvent } from "@testing-library/svelte";
 import { EditorView } from "@codemirror/view";
 import QueryEditor from "../QueryEditor.svelte";
+import { editorView } from "../../test/editor";
 
 function setup(value: string) {
   const onChange = vi.fn();
-  const { container, rerender } = render(QueryEditor, { props: { value, onChange } });
-  const content = container.querySelector(".cm-content") as HTMLElement;
-  const view = EditorView.findFromDOM(content)!;
-  view.dispatch({ selection: { anchor: value.length } });
-  return { view, content, onChange, rerender };
+  const { rerender } = render(QueryEditor, { props: { value, onChange } });
+  return { view: editorView(), onChange, rerender };
 }
 
 // jsdom can't drive real text input, so call the editor's input handlers the way a keystroke would
@@ -24,6 +22,12 @@ function typeChar(view: EditorView, text: string) {
 }
 
 describe("QueryEditor", () => {
+  it("takes focus with the cursor at the end", () => {
+    const { view } = setup("g.V()");
+    expect(view.hasFocus).toBe(true);
+    expect(view.state.selection.main.head).toBe(5);
+  });
+
   it("shows the initial value", () => {
     const { view } = setup("g.V().count()");
     expect(view.state.doc.toString()).toBe("g.V().count()");
@@ -63,10 +67,10 @@ describe("QueryEditor", () => {
   });
 
   it("puts a dot typed right after ( behind the closing paren", async () => {
-    const { view, content } = setup("g.V");
-    await fireEvent.keyDown(content, { key: "(" });
+    const { view } = setup("g.V");
+    await fireEvent.keyDown(view.contentDOM, { key: "(" });
     typeChar(view, "(");
-    await fireEvent.keyDown(content, { key: "." });
+    await fireEvent.keyDown(view.contentDOM, { key: "." });
     expect(view.state.doc.toString()).toBe("g.V().");
     expect(view.state.selection.main.head).toBe(6);
   });

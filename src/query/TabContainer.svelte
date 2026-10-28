@@ -23,7 +23,7 @@
   function createNewTab(): Tab {
     return {
       id: crypto.randomUUID(),
-      queryText: "g.V().limit(10)",
+      queryText: "",
     };
   }
 

@@ -123,6 +123,7 @@
       parent: container,
       state: EditorState.create({
         doc: value,
+        selection: { anchor: value.length },
         extensions: [
           history(),
           closeBrackets(),
@@ -153,6 +154,8 @@
         ],
       }),
     });
+    // Mounted when connecting or switching tabs: either way the next thing is typing a query
+    view.focus();
     return () => view?.destroy();
   });
 
