@@ -6,14 +6,15 @@ description: Build and verify the project compiles correctly. Run after making c
 
 Run the following verification steps in sequence. Stop and report if any step fails.
 
-## Step 1: TypeScript Build
+## Step 1: Type Check and Frontend Build
 
 ```bash
+npm run check
 npm run build
 ```
 
-This compiles TypeScript and bundles the frontend. Check for:
-- Type errors
+`npm run check` runs svelte-check, which type-checks all `.ts` and `.svelte` files (including tests). `npm run build` only bundles: Vite strips types without checking them, so a passing build says nothing about type errors. Check for:
+- Type errors and svelte-check warnings (treat both as failures)
 - Import/export issues
 - Missing dependencies
 
